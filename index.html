@@ -1,18 +1,8 @@
-<!DOCTYPE html>
+DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>情绪天气</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200;300;400&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{height:100%;overflow:hidden;font-family:'Noto Serif SC',serif;}
-#slides{position:fixed;inset:0;transition:transform 0.8s cubic-bezier(0.77,0,0.18,1);}
-.slide{position:absolute;left:0;right:0;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;overflow:hidden;}
-#dots{position:fixed;right:16px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px;z-index:100;}
-.dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.3);transition:all 0.4s;cursor:pointer;}
-.dot.on{background:rgba(255,255,255,0.9);transform:scale(1.4);}
+<meta name="
 #swipe-hint{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);font-size:10px;letter-spacing:4px;color:rgba(255,255,255,0.35);z-index:100;animation:bounce 2s ease-in-out infinite;pointer-events:none;}
 @keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-6px)}}
 .tag{font-size:9px;letter-spacing:5px;color:rgba(255,255,255,0.4);margin-bottom:16px;opacity:0;transition:all 0.8s 0.2s;transform:translateY(12px);}
