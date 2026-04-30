@@ -2,250 +2,219 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>情绪天气 · 今日预报</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>情绪天气</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200;300;400&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
-html,body{height:100%;overflow:hidden;}
-body{font-family:'Noto Serif SC',serif;background:#0a0a0f;color:#f0ebe0;position:relative;}
-body::after{content:'';position:fixed;inset:0;z-index:1;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;opacity:0.7;}
-#bg-canvas{position:fixed;inset:0;z-index:0;}
-.page{position:fixed;inset:0;z-index:10;display:none;flex-direction:column;}
-.page.active{display:flex;}
-.nav{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-around;align-items:center;padding:12px 8px 36px;background:linear-gradient(to top,rgba(0,0,0,0.6) 0%,transparent 100%);z-index:20;}
-.nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:8px 16px;border-radius:16px;transition:all 0.3s;-webkit-tap-highlight-color:transparent;}
-.nav-item.on{background:rgba(255,255,255,0.08);}
-.nav-icon{font-size:20px;}
-.nav-label{font-size:9px;letter-spacing:2px;color:rgba(240,235,224,0.4);transition:color 0.3s;}
-.nav-item.on .nav-label{color:rgba(240,235,224,0.9);}
-#p-home .topbar{display:flex;justify-content:space-between;align-items:flex-start;padding:52px 28px 0;animation:slideDown 1s 0.3s ease both;}
-.topbar-date{font-size:10px;letter-spacing:4px;color:rgba(240,235,224,0.35);font-weight:200;margin-bottom:4px;}
-.topbar-title{font-family:'ZCOOL XiaoWei',serif;font-size:16px;letter-spacing:6px;}
-.topbar-right{font-size:10px;letter-spacing:2px;color:rgba(240,235,224,0.3);text-align:right;line-height:2;font-weight:200;}
-.center{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:0 32px;position:relative;}
-.orb-wrap{position:relative;margin-bottom:28px;animation:fadeScale 1.2s 0.6s cubic-bezier(0.34,1.56,0.64,1) both;}
-.orb{width:130px;height:130px;border-radius:50%;display:flex;align-items:center;justify-content:center;animation:orbFloat 6s ease-in-out infinite;position:relative;}
-.orb::before{content:'';position:absolute;inset:-24px;border-radius:50%;background:inherit;filter:blur(32px);opacity:0.3;animation:orbPulse 4s ease-in-out infinite;}
-.orb-icon{font-size:50px;position:relative;z-index:1;}
-@keyframes orbFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-10px) scale(1.02)}}
-@keyframes orbPulse{0%,100%{transform:scale(1);opacity:0.3}50%{transform:scale(1.2);opacity:0.45}}
-.weather-lbl{font-size:9px;letter-spacing:6px;color:rgba(240,235,224,0.35);margin-bottom:10px;animation:fadeUp 0.8s 1s ease both;}
-.mood-name{font-family:'ZCOOL XiaoWei',serif;font-size:clamp(34px,10vw,52px);line-height:1.1;margin-bottom:14px;animation:fadeUp 0.8s 1.1s ease both;}
-.mood-poem{font-size:13px;font-weight:200;color:rgba(240,235,224,0.5);letter-spacing:1.5px;line-height:2;animation:fadeUp 0.8s 1.2s ease both;}
-.forecast{padding:0 18px 12px;animation:slideUp 0.9s 1.4s ease both;}
-.forecast-lbl{font-size:9px;letter-spacing:5px;color:rgba(240,235,224,0.25);text-align:center;margin-bottom:12px;}
-.forecast-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-.f-item{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:12px 8px;text-align:center;backdrop-filter:blur(8px);}
-.f-icon{font-size:20px;margin-bottom:6px;}
-.f-time{font-size:9px;letter-spacing:2px;color:rgba(240,235,224,0.3);margin-bottom:3px;}
-.f-text{font-size:10px;font-weight:300;color:rgba(240,235,224,0.65);}
-.advice{margin:0 18px 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:12px;backdrop-filter:blur(8px);animation:slideUp 0.9s 1.6s ease both;cursor:pointer;transition:background 0.3s;-webkit-tap-highlight-color:transparent;}
-.advice:active{background:rgba(255,255,255,0.08);}
-.advice-ico{font-size:18px;flex-shrink:0;}
-.advice-txt{font-size:12px;font-weight:200;color:rgba(240,235,224,0.6);line-height:1.8;}
-.advice-txt em{font-style:normal;color:rgba(240,235,224,0.95);}
-.quick-actions{display:flex;gap:8px;padding:0 18px 16px;animation:slideUp 0.9s 1.7s ease both;}
-.qa-btn{flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);border-radius:12px;padding:10px 6px;font-size:10px;letter-spacing:2px;color:rgba(240,235,224,0.5);font-family:'Noto Serif SC',serif;cursor:pointer;text-align:center;transition:all 0.25s;-webkit-tap-highlight-color:transparent;}
-.qa-btn:active{transform:scale(0.96);background:rgba(255,255,255,0.1);}
-.qa-btn.highlight{border-color:rgba(240,235,224,0.2);color:rgba(240,235,224,0.85);}
-#p-quiz{overflow-y:auto;padding-bottom:100px;}
-.quiz-header{padding:52px 28px 28px;}
-.quiz-header h2{font-family:'ZCOOL XiaoWei',serif;font-size:28px;letter-spacing:4px;margin-bottom:8px;}
-.quiz-header p{font-size:12px;letter-spacing:2px;color:rgba(240,235,224,0.35);font-weight:200;}
-.qz-progress{margin:0 28px 24px;height:2px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden;}
-.qz-fill{height:100%;border-radius:2px;transition:width 0.6s cubic-bezier(0.34,1.2,0.64,1);}
-.qz-card{margin:0 18px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:24px 20px;backdrop-filter:blur(10px);}
-.qz-scene{font-size:9px;letter-spacing:4px;color:rgba(240,235,224,0.35);margin-bottom:12px;}
-.qz-q{font-family:'ZCOOL XiaoWei',serif;font-size:clamp(17px,5vw,22px);line-height:1.55;margin-bottom:24px;}
-.qz-opts{display:flex;flex-direction:column;gap:10px;}
-.qz-opt{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px 16px;font-size:13px;font-weight:200;line-height:1.7;font-family:'Noto Serif SC',serif;color:rgba(240,235,224,0.75);cursor:pointer;text-align:left;transition:all 0.25s;-webkit-tap-highlight-color:transparent;}
-.qz-opt:active,.qz-opt.picked{border-color:rgba(240,235,224,0.25);background:rgba(255,255,255,0.08);color:#f0ebe0;}
-.qz-result{margin:0 18px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:24px;padding:32px 24px;text-align:center;display:none;animation:fadeScale 0.8s cubic-bezier(0.34,1.2,0.64,1) both;}
-.qz-result.show{display:block;}
-.r-orb{font-size:56px;margin-bottom:16px;}
-.r-title{font-family:'ZCOOL XiaoWei',serif;font-size:28px;margin-bottom:6px;}
-.r-level{font-size:10px;letter-spacing:4px;color:rgba(240,235,224,0.4);margin-bottom:20px;}
-.r-desc{font-size:13px;font-weight:200;color:rgba(240,235,224,0.6);line-height:2;margin-bottom:24px;}
-.r-tags{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:28px;}
-.r-tag{font-size:10px;letter-spacing:1px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:5px 14px;color:rgba(240,235,224,0.7);}
-.r-actions{display:flex;gap:10px;justify-content:center;}
-.btn-outline{background:none;border:1px solid rgba(255,255,255,0.18);border-radius:30px;padding:10px 22px;font-size:12px;letter-spacing:2px;color:rgba(240,235,224,0.7);font-family:'Noto Serif SC',serif;cursor:pointer;transition:all 0.3s;-webkit-tap-highlight-color:transparent;}
-.btn-solid{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.18);border-radius:30px;padding:10px 22px;font-size:12px;letter-spacing:2px;color:#f0ebe0;font-family:'Noto Serif SC',serif;cursor:pointer;transition:all 0.3s;-webkit-tap-highlight-color:transparent;}
-.btn-outline:active,.btn-solid:active{transform:scale(0.96);}
-#p-diary{overflow-y:auto;padding-bottom:100px;}
-.diary-header{padding:52px 28px 24px;}
-.diary-header h2{font-family:'ZCOOL XiaoWei',serif;font-size:28px;letter-spacing:4px;margin-bottom:6px;}
-.diary-header p{font-size:11px;letter-spacing:2px;color:rgba(240,235,224,0.35);font-weight:200;}
-.diary-input-area{margin:0 18px 16px;}
-.diary-textarea{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:18px;padding:20px;font-size:14px;font-weight:200;font-family:'Noto Serif SC',serif;color:#f0ebe0;line-height:2;resize:none;height:140px;outline:none;transition:border-color 0.3s;}
-.diary-textarea::placeholder{color:rgba(240,235,224,0.2);}
-.diary-textarea:focus{border-color:rgba(240,235,224,0.2);}
-.diary-moods{display:flex;gap:8px;margin:0 18px 16px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;font-family:'Noto Serif SC',serif;}
+#slides{position:fixed;inset:0;transition:transform 0.8s cubic-bezier(0.77,0,0.18,1);}
+.slide{position:absolute;left:0;right:0;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;overflow:hidden;}
+#dots{position:fixed;right:16px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px;z-index:100;}
+.dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.3);transition:all 0.4s;cursor:pointer;}
+.dot.on{background:rgba(255,255,255,0.9);transform:scale(1.4);}
+#swipe-hint{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);font-size:10px;letter-spacing:4px;color:rgba(255,255,255,0.35);z-index:100;animation:bounce 2s ease-in-out infinite;pointer-events:none;}
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-6px)}}
+.tag{font-size:9px;letter-spacing:5px;color:rgba(255,255,255,0.4);margin-bottom:16px;opacity:0;transition:all 0.8s 0.2s;transform:translateY(12px);}
+.big-title{font-family:'ZCOOL XiaoWei',serif;font-size:clamp(40px,12vw,72px);line-height:1.1;text-align:center;color:#fff;margin-bottom:20px;opacity:0;transition:all 0.8s 0.35s;transform:translateY(16px);}
+.sub-text{font-size:13px;font-weight:200;color:rgba(255,255,255,0.55);line-height:2;text-align:center;max-width:280px;opacity:0;transition:all 0.8s 0.5s;transform:translateY(16px);}
+.slide.in .tag,.slide.in .big-title,.slide.in .sub-text,.slide.in .choices,.slide.in .orb-wrap,.slide.in .result-wrap,.slide.in .quiz-card,.slide.in .diary-area,.slide.in .drift-wrap{opacity:1;transform:none!important;}
+.choices{display:flex;flex-direction:column;gap:10px;width:calc(100% - 48px);max-width:340px;margin-top:28px;opacity:0;transition:all 0.8s 0.65s;transform:translateY(16px);}
+.choice{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:14px;padding:15px 20px;font-size:13px;font-weight:200;color:rgba(255,255,255,0.85);font-family:'Noto Serif SC',serif;cursor:pointer;text-align:left;transition:all 0.25s;position:relative;overflow:hidden;}
+.choice:active{transform:scale(0.98);}
+.choice.picked{background:rgba(255,255,255,0.18);border-color:rgba(255,255,255,0.4);color:#fff;}
+.choice.picked::after{content:'✓';position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:14px;color:rgba(255,255,255,0.7);}
+.choice.dim{opacity:0.3;}
+.next-btn{margin-top:24px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);border-radius:30px;padding:12px 36px;font-size:12px;letter-spacing:3px;color:#fff;font-family:'Noto Serif SC',serif;cursor:pointer;transition:all 0.3s;opacity:0;pointer-events:none;}
+.next-btn.show{opacity:1;pointer-events:all;}
+.next-btn:active{transform:scale(0.97);}
+.result-wrap{opacity:0;transition:all 0.8s 0.2s;transform:scale(0.9);text-align:center;padding:0 24px;width:100%;}
+.result-badge{font-size:52px;margin-bottom:12px;}
+.result-title{font-family:'ZCOOL XiaoWei',serif;font-size:28px;color:#fff;margin-bottom:6px;}
+.result-level{font-size:10px;letter-spacing:4px;color:rgba(255,255,255,0.4);margin-bottom:20px;}
+.result-desc{font-size:13px;font-weight:200;color:rgba(255,255,255,0.6);line-height:2;margin-bottom:24px;}
+.result-tags{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:28px;}
+.rtag{font-size:10px;letter-spacing:1px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:20px;padding:5px 14px;color:rgba(255,255,255,0.7);}
+.diary-area{width:calc(100% - 40px);max-width:360px;opacity:0;transition:all 0.8s 0.4s;transform:translateY(20px);}
+.diary-ta{width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:18px;font-size:14px;font-weight:200;font-family:'Noto Serif SC',serif;color:#fff;line-height:2;resize:none;height:120px;outline:none;transition:border-color 0.3s;}
+.diary-ta::placeholder{color:rgba(255,255,255,0.2);}
+.diary-ta:focus{border-color:rgba(255,255,255,0.3);}
+.diary-moods{display:flex;gap:8px;margin-top:12px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;}
 .diary-moods::-webkit-scrollbar{display:none;}
-.dm-btn{flex-shrink:0;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:8px 14px;font-size:12px;font-family:'Noto Serif SC',serif;color:rgba(240,235,224,0.5);cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.25s;-webkit-tap-highlight-color:transparent;white-space:nowrap;}
-.dm-btn:active,.dm-btn.on{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.2);color:#f0ebe0;}
-.diary-submit{margin:0 18px 24px;width:calc(100% - 36px);background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:14px;font-size:13px;letter-spacing:3px;color:rgba(240,235,224,0.85);font-family:'Noto Serif SC',serif;cursor:pointer;transition:all 0.3s;-webkit-tap-highlight-color:transparent;}
-.diary-submit:active{transform:scale(0.98);}
-.diary-divider{display:flex;align-items:center;gap:12px;margin:0 18px 20px;}
-.diary-divider::before,.diary-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.07);}
-.diary-divider span{font-size:9px;letter-spacing:4px;color:rgba(240,235,224,0.25);}
-.diary-entries{padding:0 18px;}
-.diary-entry{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:18px;padding:20px;margin-bottom:12px;}
-.entry-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
-.entry-mood{font-size:18px;}
-.entry-time{font-size:9px;letter-spacing:2px;color:rgba(240,235,224,0.25);}
-.entry-text{font-size:13px;font-weight:200;line-height:1.9;color:rgba(240,235,224,0.7);}
-.entry-tag{display:inline-block;margin-top:10px;font-size:9px;letter-spacing:2px;color:rgba(240,235,224,0.3);background:rgba(255,255,255,0.05);border-radius:10px;padding:3px 10px;}
-#p-drift{overflow-y:auto;padding-bottom:100px;}
-.drift-header{padding:52px 28px 24px;}
-.drift-header h2{font-family:'ZCOOL XiaoWei',serif;font-size:28px;letter-spacing:4px;margin-bottom:6px;}
-.drift-header p{font-size:11px;letter-spacing:2px;color:rgba(240,235,224,0.35);font-weight:200;}
-.drift-ocean{margin:0 18px 20px;height:160px;background:linear-gradient(180deg,rgba(20,40,80,0.6) 0%,rgba(10,20,50,0.8) 100%);border:1px solid rgba(255,255,255,0.07);border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;transition:all 0.3s;-webkit-tap-highlight-color:transparent;}
+.dm{flex-shrink:0;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:7px 14px;font-size:11px;font-family:'Noto Serif SC',serif;color:rgba(255,255,255,0.5);cursor:pointer;transition:all 0.25s;white-space:nowrap;}
+.dm.on{background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.3);color:#fff;}
+.diary-save{width:100%;margin-top:12px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:12px;padding:13px;font-size:12px;letter-spacing:3px;color:rgba(255,255,255,0.85);font-family:'Noto Serif SC',serif;cursor:pointer;transition:all 0.3s;}
+.diary-save:active{transform:scale(0.98);}
+.drift-wrap{opacity:0;transition:all 0.8s 0.4s;transform:translateY(20px);width:calc(100% - 40px);max-width:360px;}
+.drift-ocean{height:130px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;transition:all 0.3s;margin-bottom:16px;}
 .drift-ocean:active{transform:scale(0.98);}
-.drift-wave{position:absolute;bottom:0;left:-50%;width:200%;height:60px;background:rgba(255,255,255,0.04);border-radius:40% 40% 0 0;animation:wave 4s ease-in-out infinite;}
-.drift-wave2{animation:wave 5s ease-in-out infinite 1s;opacity:0.6;}
-@keyframes wave{0%,100%{transform:translateX(0) translateY(0)}50%{transform:translateX(5%) translateY(-8px)}}
-.drift-bottle{font-size:40px;margin-bottom:8px;animation:drift 3s ease-in-out infinite;}
+.dw{position:absolute;bottom:0;left:-50%;width:200%;height:50px;background:rgba(255,255,255,0.04);border-radius:40% 40% 0 0;animation:wave 4s ease-in-out infinite;}
+.dw2{animation:wave 5s ease-in-out infinite 1s;opacity:0.5;}
+@keyframes wave{0%,100%{transform:translateX(0) translateY(0)}50%{transform:translateX(5%) translateY(-6px)}}
+.bottle{font-size:36px;animation:drift 3s ease-in-out infinite;margin-bottom:6px;}
 @keyframes drift{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-8px) rotate(5deg)}}
-.drift-hint{font-size:11px;letter-spacing:3px;color:rgba(240,235,224,0.4);}
-.drift-cards{padding:0 18px;}
-.drift-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:18px;padding:22px;margin-bottom:12px;position:relative;}
-.dc-quote{font-size:14px;font-weight:200;line-height:2;color:rgba(240,235,224,0.75);margin-bottom:16px;font-style:italic;}
-.dc-mood{font-size:20px;margin-bottom:4px;}
-.dc-from{font-size:9px;letter-spacing:3px;color:rgba(240,235,224,0.25);}
-.dc-resonate{position:absolute;bottom:18px;right:18px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:6px 14px;font-size:10px;letter-spacing:1px;color:rgba(240,235,224,0.45);cursor:pointer;font-family:'Noto Serif SC',serif;transition:all 0.25s;-webkit-tap-highlight-color:transparent;}
-.dc-resonate:active,.dc-resonate.on{background:rgba(255,255,255,0.1);color:#f0ebe0;border-color:rgba(255,255,255,0.2);}
-.overlay{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,0.7);backdrop-filter:blur(20px);display:flex;flex-direction:column;justify-content:flex-end;opacity:0;pointer-events:none;transition:opacity 0.35s;}
-.overlay.show{opacity:1;pointer-events:all;}
-.sheet{background:rgba(14,14,20,0.98);border-radius:28px 28px 0 0;border-top:1px solid rgba(255,255,255,0.08);padding:24px 20px 48px;transform:translateY(100%);transition:transform 0.4s cubic-bezier(0.34,1.2,0.64,1);}
-.overlay.show .sheet{transform:translateY(0);}
-.sheet-handle{width:32px;height:3px;background:rgba(255,255,255,0.12);border-radius:2px;margin:0 auto 22px;}
-.sheet-title{font-family:'ZCOOL XiaoWei',serif;font-size:20px;text-align:center;margin-bottom:6px;}
-.sheet-sub{font-size:10px;letter-spacing:3px;color:rgba(240,235,224,0.3);text-align:center;margin-bottom:24px;}
-.mood-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.mood-opt{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:16px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all 0.25s;-webkit-tap-highlight-color:transparent;}
-.mood-opt:active{transform:scale(0.97);background:rgba(255,255,255,0.09);}
-.mo-ico{font-size:26px;}
-.mo-name{font-family:'ZCOOL XiaoWei',serif;font-size:15px;margin-bottom:2px;}
-.mo-sub{font-size:9px;letter-spacing:1px;color:rgba(240,235,224,0.35);}
-.toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,0.1);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.12);border-radius:30px;padding:10px 24px;font-size:12px;letter-spacing:2px;color:rgba(240,235,224,0.85);z-index:999;white-space:nowrap;animation:fadeUp 0.3s ease;pointer-events:none;}
-@keyframes slideDown{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:translateY(0)}}
-@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-@keyframes fadeScale{from{opacity:0;transform:scale(0.75)}to{opacity:1;transform:scale(1)}}
-.fading{opacity:0!important;transition:opacity 0.35s ease;}
+.drift-hint{font-size:10px;letter-spacing:3px;color:rgba(255,255,255,0.35);}
+.drift-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:18px 18px 44px;position:relative;margin-bottom:10px;}
+.dc-text{font-size:13px;font-weight:200;line-height:1.9;color:rgba(255,255,255,0.7);font-style:italic;margin-bottom:8px;}
+.dc-from{font-size:9px;letter-spacing:3px;color:rgba(255,255,255,0.25);}
+.dc-like{position:absolute;bottom:14px;right:14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:5px 14px;font-size:10px;letter-spacing:1px;color:rgba(255,255,255,0.45);cursor:pointer;font-family:'Noto Serif SC',serif;transition:all 0.25s;}
+.dc-like.on{background:rgba(255,255,255,0.12);color:#fff;}
+#canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.4);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);border-radius:30px;padding:10px 24px;font-size:11px;letter-spacing:2px;color:rgba(255,255,255,0.8);z-index:999;white-space:nowrap;pointer-events:none;animation:fadeUp 0.3s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+#s0{background:linear-gradient(145deg,#0d0d1f 0%,#1a0a2e 100%);}
+#s1{background:linear-gradient(145deg,#071a1a 0%,#0d2e2a 100%);}
+#s2{background:linear-gradient(145deg,#1a0d2e 0%,#2e0d1a 100%);}
+#s3{background:linear-gradient(145deg,#0a1a0d 0%,#0d2e1a 100%);}
+#s4{background:linear-gradient(145deg,#1a1200 0%,#2e2000 100%);}
+#s5{background:linear-gradient(145deg,#0d1a2e 0%,#0a1220 100%);}
+#s6{background:linear-gradient(145deg,#1a0a0a 0%,#2e1a0a 100%);}
+#s7{background:linear-gradient(145deg,#1a0d12 0%,#2e0d1a 100%);}
+#s8{background:linear-gradient(145deg,#060f1a 0%,#0a1a2e 100%);}
+#s9{background:linear-gradient(145deg,#0d0d0d 0%,#1a1a1a 100%);}
 </style>
 </head>
 <body>
-<canvas id="bg-canvas"></canvas>
-<div class="page active" id="p-home">
-  <div class="topbar">
-    <div><div class="topbar-date" id="today-date"></div><div class="topbar-title">情绪天气</div></div>
-    <div class="topbar-right">今日播报<br>内向星球</div>
-  </div>
-  <div class="center">
-    <div class="orb-wrap"><div class="orb" id="main-orb"><div class="orb-icon" id="orb-icon"></div></div></div>
-    <div class="weather-lbl">今日情绪天气</div>
-    <div class="mood-name" id="mood-name"></div>
-    <div class="mood-poem" id="mood-poem"></div>
-  </div>
-  <div class="forecast"><div class="forecast-lbl">三段预报</div><div class="forecast-row" id="forecast-row"></div></div>
-  <div class="advice" id="advice-strip" onclick="nextAdvice()"><div class="advice-ico" id="advice-ico"></div><div class="advice-txt" id="advice-txt"></div></div>
-  <div class="quick-actions">
-    <div class="qa-btn highlight" onclick="openPicker()">切换心情</div>
-    <div class="qa-btn" onclick="shuffleMood()">随机天气</div>
-    <div class="qa-btn" onclick="showToast('截图这一屏，发给懂的人 🌙')">截图分享</div>
-  </div>
-  <div class="nav">
-    <div class="nav-item on" onclick="goPage('home')"><div class="nav-icon">🌫️</div><div class="nav-label">天气</div></div>
-    <div class="nav-item" onclick="goPage('quiz')"><div class="nav-icon">🪞</div><div class="nav-label">测温</div></div>
-    <div class="nav-item" onclick="goPage('diary')"><div class="nav-icon">📓</div><div class="nav-label">日记</div></div>
-    <div class="nav-item" onclick="goPage('drift')"><div class="nav-icon">🌊</div><div class="nav-label">漂流</div></div>
+<canvas id="canvas"></canvas>
+<div id="dots"></div>
+<div id="swipe-hint">向上滑动 ↑</div>
+<div id="slides">
+<div class="slide" id="s0" style="top:0">
+  <div class="tag">EMOTIONAL WEATHER · 情绪天气</div>
+  <div class="big-title">你今天<br>怎么了</div>
+  <div class="sub-text">8个问题<br>帮你找到今天的情绪频率</div>
+  <div class="choices"><div class="choice" onclick="goSlide(1)" style="text-align:center;letter-spacing:2px;">开始今天的测试 →</div></div>
+</div>
+<div class="slide" id="s1" style="top:100vh">
+  <div class="tag">第一步 · 直觉选择</div>
+  <div class="big-title" style="font-size:clamp(28px,8vw,44px);">现在这一刻<br>你更像哪个</div>
+  <div class="choices" id="mood-choices">
+    <div class="choice" onclick="pickMood(this,'cloudy')">🌫️ &nbsp;有点沉，说不上哪里不对</div>
+    <div class="choice" onclick="pickMood(this,'storm')">⛈️ &nbsp;心里有什么在压着</div>
+    <div class="choice" onclick="pickMood(this,'rain')">🌧️ &nbsp;莫名想哭，没有理由</div>
+    <div class="choice" onclick="pickMood(this,'soft')">⛅ &nbsp;还好，就是有点空</div>
+    <div class="choice" onclick="pickMood(this,'clear')">☀️ &nbsp;今天难得，心情还不错</div>
+    <div class="choice" onclick="pickMood(this,'numb')">🪨 &nbsp;麻木，什么都感觉不到</div>
   </div>
 </div>
-<div class="page" id="p-quiz">
-  <div class="quiz-header"><h2>情绪测温</h2><p>8个场景 · 找到你今天的频率</p></div>
-  <div class="qz-progress"><div class="qz-fill" id="qz-fill" style="width:0%"></div></div>
-  <div id="qz-body" style="padding:0 0 20px;"></div>
-  <div class="qz-result" id="qz-result">
-    <div class="r-orb" id="r-orb"></div><div class="r-title" id="r-title"></div><div class="r-level" id="r-level"></div><div class="r-desc" id="r-desc"></div><div class="r-tags" id="r-tags"></div>
-    <div class="r-actions"><button class="btn-outline" onclick="resetQuiz()">再测一次</button><button class="btn-solid" onclick="applyResultMood()">应用到天气</button></div>
+<div class="slide" id="s2" style="top:200vh">
+  <div style="position:absolute;top:0;left:0;right:0;height:3px;background:rgba(255,255,255,0.06);"><div style="height:100%;background:rgba(255,255,255,0.25);width:25%;"></div></div>
+  <div class="tag">场景 01 · 📱 手机响了</div>
+  <div class="big-title" style="font-size:clamp(22px,6vw,34px);">陌生号码来电<br>你第一反应是</div>
+  <div class="choices" id="q1-choices">
+    <div class="choice" onclick="pickQ(this,'q1',0,'nb2')">直接接，有什么事说</div>
+    <div class="choice" onclick="pickQ(this,'q1',1,'nb2')">看看是哪里再决定</div>
+    <div class="choice" onclick="pickQ(this,'q1',2,'nb2')">等它挂断，搜索号码再回</div>
+    <div class="choice" onclick="pickQ(this,'q1',3,'nb2')">不接也不查，假装不存在</div>
   </div>
-  <div class="nav">
-    <div class="nav-item" onclick="goPage('home')"><div class="nav-icon">🌫️</div><div class="nav-label">天气</div></div>
-    <div class="nav-item on" onclick="goPage('quiz')"><div class="nav-icon">🪞</div><div class="nav-label">测温</div></div>
-    <div class="nav-item" onclick="goPage('diary')"><div class="nav-icon">📓</div><div class="nav-label">日记</div></div>
-    <div class="nav-item" onclick="goPage('drift')"><div class="nav-icon">🌊</div><div class="nav-label">漂流</div></div>
+  <button class="next-btn" id="nb2" onclick="goSlide(3)">下一个场景 →</button>
+</div>
+<div class="slide" id="s3" style="top:300vh">
+  <div style="position:absolute;top:0;left:0;right:0;height:3px;background:rgba(255,255,255,0.06);"><div style="height:100%;background:rgba(255,255,255,0.25);width:50%;"></div></div>
+  <div class="tag">场景 02 · 🍽️ 聚餐结束</div>
+  <div class="big-title" style="font-size:clamp(22px,6vw,34px);">三小时饭局散场<br>回家路上你感觉</div>
+  <div class="choices" id="q2-choices">
+    <div class="choice" onclick="pickQ(this,'q2',0,'nb3')">还没尽兴，还想再聊</div>
+    <div class="choice" onclick="pickQ(this,'q2',1,'nb3')">还好，有点累了</div>
+    <div class="choice" onclick="pickQ(this,'q2',2,'nb3')">终于可以一个人了，如释重负</div>
+    <div class="choice" onclick="pickQ(this,'q2',3,'nb3')">开始复盘今天说的每一句话</div>
+  </div>
+  <button class="next-btn" id="nb3" onclick="goSlide(4)">下一个场景 →</button>
+</div>
+<div class="slide" id="s4" style="top:400vh">
+  <div style="position:absolute;top:0;left:0;right:0;height:3px;background:rgba(255,255,255,0.06);"><div style="height:100%;background:rgba(255,255,255,0.25);width:75%;"></div></div>
+  <div class="tag">场景 03 · 💬 群里@你了</div>
+  <div class="big-title" style="font-size:clamp(22px,6vw,34px);">工作群问你问题<br>你会</div>
+  <div class="choices" id="q3-choices">
+    <div class="choice" onclick="pickQ(this,'q3',0,'nb4')">马上回复</div>
+    <div class="choice" onclick="pickQ(this,'q3',1,'nb4')">想好措辞再发</div>
+    <div class="choice" onclick="pickQ(this,'q3',2,'nb4')">先看别人怎么说，再补一句</div>
+    <div class="choice" onclick="pickQ(this,'q3',3,'nb4')">假装没看见，等话题过去</div>
+  </div>
+  <button class="next-btn" id="nb4" onclick="goSlide(5)">下一个场景 →</button>
+</div>
+<div class="slide" id="s5" style="top:500vh">
+  <div style="position:absolute;top:0;left:0;right:0;height:3px;background:rgba(255,255,255,0.06);"><div style="height:100%;background:rgba(255,255,255,0.25);width:100%;"></div></div>
+  <div class="tag">场景 04 · 🛗 等电梯</div>
+  <div class="big-title" style="font-size:clamp(22px,6vw,34px);">和不太熟的同事<br>一起等电梯</div>
+  <div class="choices" id="q4-choices">
+    <div class="choice" onclick="pickQ(this,'q4',0,'nb5')">自然地聊起来</div>
+    <div class="choice" onclick="pickQ(this,'q4',1,'nb5')">礼貌性微笑，说几句</div>
+    <div class="choice" onclick="pickQ(this,'q4',2,'nb5')">低头看手机，其实屏幕是黑的</div>
+    <div class="choice" onclick="pickQ(this,'q4',3,'nb5')">直接走楼梯</div>
+  </div>
+  <button class="next-btn" id="nb5" onclick="showResult()">查看我的结果 →</button>
+</div>
+<div class="slide" id="s6" style="top:600vh">
+  <div class="result-wrap" id="result-wrap">
+    <div class="result-badge" id="r-badge"></div>
+    <div class="result-title" id="r-title"></div>
+    <div class="result-level" id="r-level"></div>
+    <div class="result-desc" id="r-desc"></div>
+    <div class="result-tags" id="r-tags"></div>
+    <button class="next-btn show" onclick="goSlide(7)" style="margin-top:0;">记录今天的心情 →</button>
   </div>
 </div>
-<div class="page" id="p-diary">
-  <div class="diary-header"><h2>情绪日记</h2><p>写下来，就轻一点</p></div>
-  <div class="diary-input-area"><textarea class="diary-textarea" id="diary-input" placeholder="今天有什么想说的……不用整理，随便写。"></textarea></div>
-  <div class="diary-moods" id="diary-moods"></div>
-  <button class="diary-submit" onclick="saveDiary()">悄悄记下来 →</button>
-  <div class="diary-divider"><span>往期情绪</span></div>
-  <div class="diary-entries" id="diary-entries"></div>
-  <div class="nav">
-    <div class="nav-item" onclick="goPage('home')"><div class="nav-icon">🌫️</div><div class="nav-label">天气</div></div>
-    <div class="nav-item" onclick="goPage('quiz')"><div class="nav-icon">🪞</div><div class="nav-label">测温</div></div>
-    <div class="nav-item on" onclick="goPage('diary')"><div class="nav-icon">📓</div><div class="nav-label">日记</div></div>
-    <div class="nav-item" onclick="goPage('drift')"><div class="nav-icon">🌊</div><div class="nav-label">漂流</div></div>
+<div class="slide" id="s7" style="top:700vh">
+  <div class="tag">情绪日记 · 写下来就轻一点</div>
+  <div class="big-title" style="font-size:clamp(26px,7vw,40px);margin-bottom:16px;">今天<br>有什么话</div>
+  <div class="diary-area">
+    <textarea class="diary-ta" id="diary-ta" placeholder="不用整理，随便写……"></textarea>
+    <div class="diary-moods" id="diary-moods"></div>
+    <button class="diary-save" onclick="saveDiary()">悄悄记下来 →</button>
   </div>
 </div>
-<div class="page" id="p-drift">
-  <div class="drift-header"><h2>情绪漂流瓶</h2><p>扔进去 · 捡起来 · 知道有人懂</p></div>
-  <div class="drift-ocean" onclick="throwBottle()"><div class="drift-wave"></div><div class="drift-wave drift-wave2"></div><div class="drift-bottle">🫙</div><div class="drift-hint">点击扔出一个漂流瓶</div></div>
-  <div class="drift-cards" id="drift-cards"></div>
-  <div class="nav">
-    <div class="nav-item" onclick="goPage('home')"><div class="nav-icon">🌫️</div><div class="nav-label">天气</div></div>
-    <div class="nav-item" onclick="goPage('quiz')"><div class="nav-icon">🪞</div><div class="nav-label">测温</div></div>
-    <div class="nav-item" onclick="goPage('diary')"><div class="nav-icon">📓</div><div class="nav-label">日记</div></div>
-    <div class="nav-item on" onclick="goPage('drift')"><div class="nav-icon">🌊</div><div class="nav-label">漂流</div></div>
+<div class="slide" id="s8" style="top:800vh">
+  <div class="tag">情绪漂流瓶 · 知道有人懂</div>
+  <div class="big-title" style="font-size:clamp(26px,7vw,40px);margin-bottom:16px;">陌生人<br>的碎碎念</div>
+  <div class="drift-wrap">
+    <div class="drift-ocean" onclick="throwBottle()">
+      <div class="dw"></div><div class="dw dw2"></div>
+      <div class="bottle">🫙</div>
+      <div class="drift-hint">点击扔出你的漂流瓶</div>
+    </div>
+    <div id="drift-list"></div>
   </div>
 </div>
-<div class="overlay" id="overlay" onclick="closePicker(event)">
-  <div class="sheet"><div class="sheet-handle"></div><div class="sheet-title">今天你怎么了</div><div class="sheet-sub">选一个最接近的</div><div class="mood-grid" id="mood-grid"></div></div>
+<div class="slide" id="s9" style="top:900vh">
+  <div class="tag">· 内向星球 ·</div>
+  <div class="big-title">安静<br>不是没话说</div>
+  <div class="sub-text">是因为值得说的人<br>还没出现</div>
+  <div class="choices"><div class="choice" onclick="restart()" style="text-align:center;letter-spacing:2px;">重新来一次 ↺</div></div>
+  <div style="position:absolute;bottom:52px;font-size:9px;letter-spacing:4px;color:rgba(255,255,255,0.2);">情绪天气 · 每日播报</div>
+</div>
 </div>
 <script>
-const moods=[{id:'cloudy',name:'多云转阴',icon:'🌫️',color:['#3a3a5c','#1e1e30'],orb:'radial-gradient(circle at 40% 35%,#6b6b9a,#2a2a4a)',particle:'#4a4a7a',poem:'今天的心情像窗外的天\n说不上哪里不对\n就是有点沉',forecast:[{time:'上午',icon:'😶',text:'发呆模式'},{time:'下午',icon:'☁️',text:'情绪低气压'},{time:'傍晚',icon:'🌙',text:'慢慢好一点'}],advices:[{ico:'🫖',txt:'建议今天<em>减少不必要的社交</em>，泡一杯热的，允许自己什么都不做。'},{ico:'🎵',txt:'<em>戴上耳机</em>，把音量调到刚好盖住世界的那个位置。'},{ico:'🛋️',txt:'今天可以<em>躺着发呆</em>，什么都不想也算一种休息。'}]},{id:'storm',name:'内心有雷',icon:'⛈️',color:['#1a1a2e','#0d0d1a'],orb:'radial-gradient(circle at 40% 35%,#5a2a7a,#1a0a2a)',particle:'#6a2a9a',poem:'有些话压在喉咙里\n说不出来\n也不知道说给谁听',forecast:[{time:'上午',icon:'😤',text:'想发泄'},{time:'下午',icon:'⚡',text:'情绪高压'},{time:'傍晚',icon:'🌧️',text:'需要释放'}],advices:[{ico:'🎧',txt:'今天适合<em>一个人听很响的音乐</em>，或者去没人的地方大声说出来。'},{ico:'✍️',txt:'把想说又没说出口的话<em>全部写下来</em>，写完就撕掉。'},{ico:'🏃',txt:'<em>去跑步</em>，把今天的愤怒踩在脚底下。'}]},{id:'haze',name:'轻度迷雾',icon:'🌁',color:['#1e2a2a','#121c1c'],orb:'radial-gradient(circle at 40% 35%,#3a6a6a,#1a3a3a)',particle:'#2a6a6a',poem:'脑子里转着很多事\n但抓不住任何一个\n就这样迷迷糊糊的',forecast:[{time:'上午',icon:'😵‍💫',text:'思维打结'},{time:'下午',icon:'🌀',text:'选择困难'},{time:'傍晚',icon:'😴',text:'放弃思考'}],advices:[{ico:'📝',txt:'把脑子里的事<em>随手写下来</em>，不用整理，写完就好。'},{ico:'🌿',txt:'<em>出去走五分钟</em>，不带目的，只是走。'},{ico:'💧',txt:'先喝一杯水，<em>把今天最小的一件事做完</em>，其他的之后再说。'}]},{id:'soft',name:'云朵微晴',icon:'⛅',color:['#2a2218','#1a1510'],orb:'radial-gradient(circle at 40% 35%,#c8a060,#6a4820)',particle:'#c8a060',poem:'今天还好\n不算开心\n但也没有很难过',forecast:[{time:'上午',icon:'😌',text:'平静如水'},{time:'下午',icon:'🌤️',text:'偶有暖意'},{time:'傍晚',icon:'✨',text:'小确幸降临'}],advices:[{ico:'🌿',txt:'今天是个<em>适合发现小事的日子</em>，一杯好喝的、一首久违的歌，都算数。'},{ico:'📖',txt:'<em>翻出一本很久没看的书</em>，哪怕只读一页。'},{ico:'🍜',txt:'今天适合<em>认真吃一顿饭</em>，慢慢吃，不看手机。'}]},{id:'rain',name:'悄悄在下雨',icon:'🌧️',color:['#0f1a2a','#090f1a'],orb:'radial-gradient(circle at 40% 35%,#2a5a8a,#0a2040)',particle:'#2a6aaa',poem:'没什么大事\n就是想哭\n也不知道为什么',forecast:[{time:'上午',icon:'😢',text:'眼眶有点酸'},{time:'下午',icon:'🌧️',text:'持续降雨'},{time:'傍晚',icon:'🌈',text:'哭完会好一点'}],advices:[{ico:'🛁',txt:'<em>允许自己哭</em>。不需要原因，不需要解释，哭完该干嘛干嘛。'},{ico:'🫂',txt:'今天可以<em>联系一个你信任的人</em>，不用说很多，就说"最近有点累"。'},{ico:'🌙',txt:'<em>早点睡</em>，很多事情睡一觉之后会不一样。'}]},{id:'clear',name:'难得放晴',icon:'☀️',color:['#1a1a10','#0f0f08'],orb:'radial-gradient(circle at 40% 35%,#e8c060,#8a6020)',particle:'#e8c060',poem:'今天莫名其妙心情还不错\n想一个人出去走走\n把今天记住',forecast:[{time:'上午',icon:'😊',text:'自带光芒'},{time:'下午',icon:'🌞',text:'能量充沛'},{time:'傍晚',icon:'🌆',text:'想记住今天'}],advices:[{ico:'📸',txt:'今天是少见的好日子，<em>做一件平时不敢做的事</em>，哪怕很小。'},{ico:'💌',txt:'<em>给一个很久没联系的人发消息</em>，就说"最近还好吗"。'},{ico:'🌟',txt:'把今天的感觉<em>写下来</em>，下次难过的时候可以翻出来看。'}]},{id:'numb',name:'感觉麻木',icon:'🪨',color:['#1a1a1a','#0f0f0f'],orb:'radial-gradient(circle at 40% 35%,#5a5a5a,#2a2a2a)',particle:'#5a5a5a',poem:'不是难过\n不是开心\n只是什么都感觉不到',forecast:[{time:'上午',icon:'😑',text:'情绪缺席'},{time:'下午',icon:'⬜',text:'空白状态'},{time:'傍晚',icon:'💤',text:'等待重启'}],advices:[{ico:'🌊',txt:'麻木有时候是情绪过载后的<em>自我保护</em>，不用强迫自己感受什么。'},{ico:'☕',txt:'<em>做一件用手的事</em>：冲咖啡、叠衣服、洗碗，让身体先动起来。'},{ico:'🕯️',txt:'今天不需要有意义，<em>存在着就够了</em>。'}]},{id:'anxious',name:'隐隐不安',icon:'🌪️',color:['#2a1a1a','#1a0f0f'],orb:'radial-gradient(circle at 40% 35%,#8a4a4a,#3a1a1a)',particle:'#8a4a4a',poem:'没有具体的事\n但心跳快了一点\n总觉得有什么在等着',forecast:[{time:'上午',icon:'😰',text:'莫名心跳快'},{time:'下午',icon:'🌪️',text:'焦虑值上升'},{time:'傍晚',icon:'😮‍💨',text:'慢慢呼吸'}],advices:[{ico:'🫁',txt:'<em>深呼吸四秒，屏气四秒，呼出四秒</em>，做三次，真的有用。'},{ico:'📋',txt:'把让你不安的事<em>列出来</em>，写出来就会发现没有想象中那么多。'},{ico:'🌿',txt:'今天<em>减少刷手机的时间</em>，信息太多会加重不安。'}]}];
-const questions=[{scene:'📱 手机响了',q:'陌生号码来电，你第一反应？',opts:[{t:'直接接',s:0},{t:'看看号码再说',s:1},{t:'等它挂断再搜索',s:2},{t:'不接也不查',s:3}]},{scene:'🍽️ 聚会结束',q:'和一群人吃了三小时饭，现在独自回家，感觉？',opts:[{t:'还想再聊',s:0},{t:'有点累但还好',s:1},{t:'终于可以一个人了',s:2},{t:'已经在复盘每句话了',s:3}]},{scene:'💬 群消息@你',q:'工作群@你问问题，你会？',opts:[{t:'马上回',s:0},{t:'想好了再回',s:1},{t:'看别人怎么说再补充',s:2},{t:'假装没看见',s:3}]},{scene:'🚪 陌生环境',q:'第一天去新地方，你会？',opts:[{t:'主动认识人',s:0},{t:'先观察一下',s:1},{t:'提前查好路线和座位',s:2},{t:'以上都做了还睡前复盘',s:3}]},{scene:'❤️ 有点心动',q:'对某人有点感觉，你的第一步？',opts:[{t:'直接表达',s:0},{t:'找朋友打听',s:1},{t:'查星座MBTI',s:2},{t:'脑子里想一百遍什么都没做',s:3}]},{scene:'🛗 等电梯',q:'和不太熟的同事一起等电梯，你会？',opts:[{t:'自然聊起来',s:0},{t:'礼貌性微笑',s:1},{t:'假装看手机',s:2},{t:'走楼梯',s:3}]},{scene:'🎤 突然被点名',q:'开会突然要你发言，你的反应？',opts:[{t:'直接说',s:0},{t:'整理一下再说',s:1},{t:'声音比平时小',s:2},{t:'发言完心跳半小时才恢复',s:3}]},{scene:'🌙 空白周末',q:'难得一个人没有安排，你最想？',opts:[{t:'约朋友出去',s:0},{t:'随便逛逛',s:1},{t:'宅着很满足',s:2},{t:'就等这一天，充电完毕',s:3}]}];
-const results=[{min:0,max:7,orb:'🌟',title:'边缘i人',level:'I/E 边界游侠',desc:'你有时享受社交，有时需要独处充电。i的基因有，但不影响你游走两端。你是那种"今天想热闹，明天想消失"的类型。',tags:['社交弹性强','状态影响型','边界感清晰','随缘社交'],moodId:'soft'},{min:8,max:13,orb:'🍃',title:'轻度i人',level:'懂得独处的社交达人',desc:'你能应对大部分社交，但需要独处补充能量。你不排斥人群，只是比较挑剔场合和对象。熟了之后会发现你其实很有意思。',tags:['选择性社交','高质量独处','慢热型','内藏话痨'],moodId:'cloudy'},{min:14,max:19,orb:'🌙',title:'标准i人',level:'内向星球正式居民',desc:'你是教科书级别的i人。喜欢独处，谨慎社交，在心里彩排过一百遍的事也不一定说出口。但你对信任的人会异常真诚。',tags:['深度优先','社交消耗大','内心戏丰富','忠诚型朋友'],moodId:'haze'},{min:20,max:24,orb:'🪐',title:'深度i人',level:'i人宇宙最深处的存在',desc:'你是i人中的i人。电话不接、电梯走楼梯、聚会复盘到深夜。但这不是缺点——你有极其丰富的内心世界，只是不轻易对外开放。',tags:['独处艺术家','高度敏感','内心宇宙级','极致忠诚'],moodId:'rain'}];
-const driftBottles=[{mood:'🌧️',text:'今天哭了，但不知道为什么。就是突然眼眶酸了，然后就哭了。',from:'某个雨天的人'},{mood:'🌫️',text:'发现自己已经很久没有真正开心过了，也不是难过，就是……平的。',from:'城市某处的窗边'},{mood:'⛅',text:'今天一个人吃了顿好吃的，突然觉得一个人也挺好的。',from:'路过的某个角落'},{mood:'⛈️',text:'想说的话太多，但每次开口又觉得算了，没人能懂。',from:'压着很多话的人'},{mood:'☀️',text:'今天路上有只猫看了我一眼，感觉今天运气会不错。',from:'相信猫的人'},{mood:'🪨',text:'不想动，不想说话，不想思考。只想就这样待着。',from:'某个需要暂停的人'}];
-let currentMood=moods[0],adviceIdx=0,quizScore=0,quizQ=0,lastResultMoodId=null,diaryEntries=[],selectedDiaryMood=null,particles=[];
-const canvas=document.getElementById('bg-canvas'),ctx=canvas.getContext('2d');
+const TOTAL=10;
+let cur=0,score=0,selectedMood='cloudy',answers={},diaryMood=null;
+const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d'),particles=[];
+const slideColors=['#2a2a6a','#0a4a4a','#4a1a6a','#0a4a2a','#4a3a00','#1a3a6a','#6a1a1a','#4a0a2a','#0a2a4a','#1a1a1a'];
 function resizeCanvas(){canvas.width=innerWidth;canvas.height=innerHeight;}
 resizeCanvas();window.addEventListener('resize',resizeCanvas);
-class P{constructor(c){this.reset(c);}reset(c){this.x=Math.random()*canvas.width;this.y=Math.random()*canvas.height;this.r=Math.random()*2+0.3;this.vx=(Math.random()-.5)*.35;this.vy=(Math.random()-.5)*.35;this.a=Math.random()*.45+.05;this.c=c;this.life=Math.random()*180+80;this.ml=this.life;}step(){this.x+=this.vx;this.y+=this.vy;this.life--;if(this.life<=0)this.reset(currentMood.particle);}draw(){const a=(this.life/this.ml)*this.a;ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle=this.c+Math.round(a*255).toString(16).padStart(2,'0');ctx.fill();}}
-for(let i=0;i<70;i++)particles.push(new P('#4a4a7a'));
-function animBg(){ctx.clearRect(0,0,canvas.width,canvas.height);const g=ctx.createLinearGradient(0,0,canvas.width*.6,canvas.height);g.addColorStop(0,currentMood.color[0]);g.addColorStop(1,currentMood.color[1]);ctx.fillStyle=g;ctx.fillRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.step();p.draw();});requestAnimationFrame(animBg);}
+class P{constructor(){this.reset();}reset(){this.x=Math.random()*canvas.width;this.y=Math.random()*canvas.height;this.r=Math.random()*1.5+0.3;this.vx=(Math.random()-.5)*.3;this.vy=(Math.random()-.5)*.3;this.a=Math.random()*.4+.05;this.life=Math.random()*200+100;this.ml=this.life;this.c=slideColors[cur]||'#4a4a7a';}step(){this.x+=this.vx;this.y+=this.vy;this.life--;if(this.life<=0)this.reset();}draw(){const a=(this.life/this.ml)*this.a;ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle=this.c+Math.round(a*255).toString(16).padStart(2,'0');ctx.fill();}}
+for(let i=0;i<80;i++)particles.push(new P());
+function animBg(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.step();p.draw();});requestAnimationFrame(animBg);}
 animBg();
-function applyMood(m,animate){if(animate){['mood-name','mood-poem','orb-icon'].forEach(id=>document.getElementById(id).classList.add('fading'));setTimeout(()=>_apply(m),350);}else _apply(m);}
-function _apply(m){currentMood=m;adviceIdx=0;particles.forEach(p=>p.c=m.particle);const orb=document.getElementById('main-orb');orb.style.background=m.orb;orb.style.boxShadow=`0 0 60px ${m.particle}55`;document.getElementById('orb-icon').textContent=m.icon;document.getElementById('mood-name').textContent=m.name;document.getElementById('mood-poem').textContent=m.poem;document.getElementById('forecast-row').innerHTML=m.forecast.map(f=>`<div class="f-item"><div class="f-icon">${f.icon}</div><div class="f-time">${f.time}</div><div class="f-text">${f.text}</div></div>`).join('');document.getElementById('advice-ico').textContent=m.advices[0].ico;document.getElementById('advice-txt').innerHTML=m.advices[0].txt;['mood-name','mood-poem','orb-icon'].forEach(id=>document.getElementById(id).classList.remove('fading'));}
-function nextAdvice(){adviceIdx=(adviceIdx+1)%currentMood.advices.length;const a=currentMood.advices[adviceIdx];const el=document.getElementById('advice-txt');el.style.opacity=0;setTimeout(()=>{el.innerHTML=a.txt;document.getElementById('advice-ico').textContent=a.ico;el.style.transition='opacity 0.4s';el.style.opacity=1;},250);showToast('换一条建议 ↻');}
-function shuffleMood(){const others=moods.filter(m=>m.id!==currentMood.id);applyMood(others[Math.floor(Math.random()*others.length)],true);}
-function openPicker(){document.getElementById('mood-grid').innerHTML=moods.map(m=>`<div class="mood-opt" onclick="pickMood('${m.id}')"><div class="mo-ico">${m.icon}</div><div><div class="mo-name">${m.name}</div><div class="mo-sub">${m.poem.split('\n')[0].slice(0,8)}…</div></div></div>`).join('');document.getElementById('overlay').classList.add('show');}
-function closePicker(e){if(e.target===document.getElementById('overlay'))document.getElementById('overlay').classList.remove('show');}
-function pickMood(id){document.getElementById('overlay').classList.remove('show');setTimeout(()=>applyMood(moods.find(m=>m.id===id),true),200);}
-function renderQuiz(){if(quizQ>=questions.length){showResult();return;}const q=questions[quizQ];document.getElementById('qz-fill').style.width=((quizQ)/questions.length)*100+'%';const body=document.getElementById('qz-body');body.innerHTML=`<div class="qz-card"><div class="qz-scene">${q.scene}</div><div class="qz-q">${q.q}</div><div class="qz-opts">${q.opts.map(o=>`<button class="qz-opt" onclick="pickOpt(this,${o.s})">${o.t}</button>`).join('')}</div></div>`;body.style.opacity=0;body.style.transform='translateY(16px)';setTimeout(()=>{body.style.transition='all 0.4s ease';body.style.opacity=1;body.style.transform='translateY(0)';},50);}
-function pickOpt(el,s){document.querySelectorAll('.qz-opt').forEach(b=>b.disabled=true);el.classList.add('picked');quizScore+=s;quizQ++;setTimeout(()=>renderQuiz(),550);}
-function showResult(){document.getElementById('qz-body').style.display='none';document.getElementById('qz-fill').style.width='100%';const r=results.find(r=>quizScore>=r.min&&quizScore<=r.max)||results[results.length-1];lastResultMoodId=r.moodId;document.getElementById('r-orb').textContent=r.orb;document.getElementById('r-title').textContent=r.title;document.getElementById('r-level').textContent=r.level;document.getElementById('r-desc').textContent=r.desc;document.getElementById('r-tags').innerHTML=r.tags.map(t=>`<span class="r-tag">${t}</span>`).join('');document.getElementById('qz-result').classList.add('show');}
-function resetQuiz(){quizScore=0;quizQ=0;document.getElementById('qz-result').classList.remove('show');document.getElementById('qz-body').style.display='';renderQuiz();}
-function applyResultMood(){if(!lastResultMoodId)return;goPage('home');setTimeout(()=>applyMood(moods.find(m=>m.id===lastResultMoodId),true),300);showToast('已应用到今日天气 🌙');}
-function buildDiaryMoods(){document.getElementById('diary-moods').innerHTML=moods.map(m=>`<div class="dm-btn" onclick="selectDiaryMood('${m.id}',this)">${m.icon} ${m.name}</div>`).join('');}
-function selectDiaryMood(id,el){selectedDiaryMood=id;document.querySelectorAll('.dm-btn').forEach(b=>b.classList.remove('on'));el.classList.add('on');}
-function saveDiary(){const txt=document.getElementById('diary-input').value.trim();if(!txt){document.getElementById('diary-input').focus();return;}const m=selectedDiaryMood?moods.find(x=>x.id===selectedDiaryMood):moods[0];const now2=new Date();const time=`${now2.getHours().toString().padStart(2,'0')}:${now2.getMinutes().toString().padStart(2,'0')}`;diaryEntries.unshift({text:txt,mood:m.icon,name:m.name,time});renderDiaryEntries();document.getElementById('diary-input').value='';document.querySelectorAll('.dm-btn').forEach(b=>b.classList.remove('on'));selectedDiaryMood=null;showToast('已悄悄记下来 🌿');}
-function renderDiaryEntries(){const c=document.getElementById('diary-entries');if(!diaryEntries.length){c.innerHTML='<div style="text-align:center;padding:32px;font-size:12px;letter-spacing:2px;color:rgba(240,235,224,0.2);">还没有记录，今天写第一条吧</div>';return;}c.innerHTML=diaryEntries.map(e=>`<div class="diary-entry"><div class="entry-top"><div class="entry-mood">${e.mood}</div><div class="entry-time">${e.time}</div></div><div class="entry-text">${e.text}</div><div class="entry-tag">${e.name}</div></div>`).join('');}
-function renderDrift(){document.getElementById('drift-cards').innerHTML=driftBottles.map((b,i)=>`<div class="drift-card" style="animation-delay:${i*80}ms"><div class="dc-mood">${b.mood}</div><div class="dc-quote">"${b.text}"</div><div class="dc-from">— ${b.from}</div><button class="dc-resonate" onclick="resonate(this)">我也是</button></div>`).join('');}
-function throwBottle(){showToast('一个装着今天的瓶子漂出去了 🫙');const newB={mood:moods[Math.floor(Math.random()*moods.length)].icon,text:'今天没什么特别的，就是突然很想把今天记下来。',from:'刚刚扔出来的你'};driftBottles.unshift(newB);renderDrift();}
-function resonate(btn){btn.classList.toggle('on');btn.textContent=btn.classList.contains('on')?'已共鸣 ✓':'我也是';}
-function goPage(name){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('p-'+name).classList.add('active');document.getElementById('p-'+name).scrollTop=0;}
+function goSlide(n){if(n<0||n>=TOTAL)return;cur=n;document.getElementById('slides').style.transform=`translateY(-${n*100}vh)`;document.querySelectorAll('.slide').forEach((s,i)=>s.classList.toggle('in',i===n));document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('on',i===n));particles.forEach(p=>p.c=slideColors[n]||'#4a4a7a');document.getElementById('swipe-hint').style.opacity=n===TOTAL-1?'0':'1';}
+const dotsEl=document.getElementById('dots');
+for(let i=0;i<TOTAL;i++){const d=document.createElement('div');d.className='dot'+(i===0?' on':'');d.onclick=()=>goSlide(i);dotsEl.appendChild(d);}
+let touchY=0;
+document.addEventListener('touchstart',e=>{touchY=e.touches[0].clientY;},{passive:true});
+document.addEventListener('touchend',e=>{const dy=touchY-e.changedTouches[0].clientY;if(Math.abs(dy)>50){if(dy>0&&cur<TOTAL-1)goSlide(cur+1);else if(dy<0&&cur>0)goSlide(cur-1);}},{passive:true});
+const moods={cloudy:{name:'多云转阴',icon:'🌫️',bg:'linear-gradient(145deg,#1a1a3a 0%,#2a2a5a 100%)',desc:'今天的心情像窗外的天，说不上哪里不对，就是有点沉。不需要解释，这也是一种真实的状态。'},storm:{name:'内心有雷',icon:'⛈️',bg:'linear-gradient(145deg,#1a0a2e 0%,#2a0a3a 100%)',desc:'有些话压在喉咙里，说不出来，也不知道说给谁听。但这种压着的感觉，值得被认真对待。'},rain:{name:'悄悄在下雨',icon:'🌧️',bg:'linear-gradient(145deg,#060f1a 0%,#0a1a2e 100%)',desc:'没什么大事，就是想哭，也不知道为什么。允许自己哭，哭完会好一点点。'},soft:{name:'云朵微晴',icon:'⛅',bg:'linear-gradient(145deg,#1a1208 0%,#2a2010 100%)',desc:'今天还好，不算开心，但也没有很难过。这种平静，其实也是一种恩赐。'},clear:{name:'难得放晴',icon:'☀️',bg:'linear-gradient(145deg,#1a1800 0%,#2a2800 100%)',desc:'今天莫名心情还不错，这种感觉很难得，值得好好记住。'},numb:{name:'感觉麻木',icon:'🪨',bg:'linear-gradient(145deg,#141414 0%,#1e1e1e 100%)',desc:'不是难过，不是开心，只是什么都感觉不到。麻木有时候是情绪过载后的自我保护。'}};
+const results=[{min:0,max:3,badge:'🌟',title:'边缘i人',level:'I/E 边界游侠',desc:'你游走在内向和外向之间，这种弹性是很宝贵的能力。',tags:['社交弹性强','随缘社交','状态影响型']},{min:4,max:7,badge:'🍃',title:'轻度i人',level:'懂得独处的社交达人',desc:'你能应对社交，但需要独处补充能量。慢热，但值得等待。',tags:['选择性社交','慢热型','内藏话痨']},{min:8,max:11,badge:'🌙',title:'标准i人',level:'内向星球正式居民',desc:'在心里彩排过一百遍的事也不一定说出口，但你对信任的人无比真诚。',tags:['深度优先','内心戏丰富','极致忠诚']},{min:12,max:16,badge:'🪐',title:'深度i人',level:'i人宇宙最深处的存在',desc:'你有极其丰富的内心世界，只是不轻易对外开放。电梯走楼梯那种。',tags:['独处艺术家','高度敏感','内心宇宙级']}];
+const driftData=[{text:'今天哭了，但不知道为什么。就是突然眼眶酸了。',from:'某个雨天的人'},{text:'发现自己很久没有真正开心过了，也不是难过，就是……平的。',from:'城市某处的窗边'},{text:'今天一个人吃了顿好吃的，突然觉得一个人也挺好的。',from:'路过的某个角落'},{text:'想说的话太多，但每次开口又觉得算了。',from:'压着很多话的人'}];
+function pickMood(el,id){selectedMood=id;document.querySelectorAll('#mood-choices .choice').forEach(c=>{c.classList.toggle('picked',c===el);c.classList.toggle('dim',c!==el);});setTimeout(()=>{document.getElementById('s6').style.background=moods[id].bg;goSlide(2);},500);}
+function pickQ(el,qid,s,nbid){if(answers[qid]!==undefined)return;answers[qid]=s;score+=s;el.parentElement.querySelectorAll('.choice').forEach(c=>{c.classList.toggle('picked',c===el);c.classList.toggle('dim',c!==el);c.onclick=null;});document.getElementById(nbid).classList.add('show');}
+function showResult(){const r=results.find(x=>score>=x.min&&score<=x.max)||results[results.length-1];const m=moods[selectedMood];document.getElementById('r-badge').textContent=m.icon;document.getElementById('r-title').textContent=m.name+' · '+r.title;document.getElementById('r-level').textContent=r.level;document.getElementById('r-desc').textContent=m.desc+' '+r.desc;document.getElementById('r-tags').innerHTML=r.tags.map(t=>`<span class="rtag">${t}</span>`).join('');goSlide(6);}
+function buildDiaryMoods(){document.getElementById('diary-moods').innerHTML=Object.entries(moods).map(([id,m])=>`<div class="dm" onclick="selectDM('${id}',this)">${m.icon} ${m.name}</div>`).join('');}
+function selectDM(id,el){diaryMood=id;document.querySelectorAll('.dm').forEach(d=>d.classList.toggle('on',d===el));}
+function saveDiary(){const txt=document.getElementById('diary-ta').value.trim();if(!txt){document.getElementById('diary-ta').focus();return;}showToast('已悄悄记下来 🌿');document.getElementById('diary-ta').value='';document.querySelectorAll('.dm').forEach(d=>d.classList.remove('on'));diaryMood=null;setTimeout(()=>goSlide(8),800);}
+function renderDrift(){document.getElementById('drift-list').innerHTML=driftData.map(d=>`<div class="drift-card"><div class="dc-text">"${d.text}"</div><div class="dc-from">— ${d.from}</div><button class="dc-like" onclick="this.classList.toggle('on');this.textContent=this.classList.contains('on')?'已共鸣 ✓':'我也是'">我也是</button></div>`).join('');}
+function throwBottle(){showToast('一个装着今天的瓶子漂出去了 🫙');driftData.unshift({text:'今天没什么特别的，就是想把今天记下来。',from:'刚刚扔出来的你'});renderDrift();}
 function showToast(msg){document.querySelectorAll('.toast').forEach(t=>t.remove());const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2200);}
-const weekdays=['日','一','二','三','四','五','六'],now=new Date();
-document.getElementById('today-date').textContent=`${now.getMonth()+1}月${now.getDate()}日 · 星期${weekdays[now.getDay()]}`;
-const h=now.getHours();let def=moods[0];
-if(h>=22||h<6)def=moods[4];else if(h>=6&&h<9)def=moods[3];else if(h>=17)def=moods[2];
-applyMood(def,false);buildDiaryMoods();renderDiaryEntries();renderDrift();resetQuiz();
+function restart(){score=0;answers={};selectedMood='cloudy';diaryMood=null;goSlide(0);}
+buildDiaryMoods();renderDrift();goSlide(0);
 </script>
 </body>
 </html>
