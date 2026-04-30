@@ -1,210 +1,125 @@
-DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="
-#swipe-hint{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);font-size:10px;letter-spacing:4px;color:rgba(255,255,255,0.35);z-index:100;animation:bounce 2s ease-in-out infinite;pointer-events:none;}
-@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-6px)}}
-.tag{font-size:9px;letter-spacing:5px;color:rgba(255,255,255,0.4);margin-bottom:16px;opacity:0;transition:all 0.8s 0.2s;transform:translateY(12px);}
-.big-title{font-family:'ZCOOL XiaoWei',serif;font-size:clamp(40px,12vw,72px);line-height:1.1;text-align:center;color:#fff;margin-bottom:20px;opacity:0;transition:all 0.8s 0.35s;transform:translateY(16px);}
-.sub-text{font-size:13px;font-weight:200;color:rgba(255,255,255,0.55);line-height:2;text-align:center;max-width:280px;opacity:0;transition:all 0.8s 0.5s;transform:translateY(16px);}
-.slide.in .tag,.slide.in .big-title,.slide.in .sub-text,.slide.in .choices,.slide.in .orb-wrap,.slide.in .result-wrap,.slide.in .quiz-card,.slide.in .diary-area,.slide.in .drift-wrap{opacity:1;transform:none!important;}
-.choices{display:flex;flex-direction:column;gap:10px;width:calc(100% - 48px);max-width:340px;margin-top:28px;opacity:0;transition:all 0.8s 0.65s;transform:translateY(16px);}
-.choice{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:14px;padding:15px 20px;font-size:13px;font-weight:200;color:rgba(255,255,255,0.85);font-family:'Noto Serif SC',serif;cursor:pointer;text-align:left;transition:all 0.25s;position:relative;overflow:hidden;}
-.choice:active{transform:scale(0.98);}
-.choice.picked{background:rgba(255,255,255,0.18);border-color:rgba(255,255,255,0.4);color:#fff;}
-.choice.picked::after{content:'✓';position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:14px;color:rgba(255,255,255,0.7);}
-.choice.dim{opacity:0.3;}
-.next-btn{margin-top:24px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);border-radius:30px;padding:12px 36px;font-size:12px;letter-spacing:3px;color:#fff;font-family:'Noto Serif SC',serif;cursor:pointer;transition:all 0.3s;opacity:0;pointer-events:none;}
-.next-btn.show{opacity:1;pointer-events:all;}
-.next-btn:active{transform:scale(0.97);}
-.result-wrap{opacity:0;transition:all 0.8s 0.2s;transform:scale(0.9);text-align:center;padding:0 24px;width:100%;}
-.result-badge{font-size:52px;margin-bottom:12px;}
-.result-title{font-family:'ZCOOL XiaoWei',serif;font-size:28px;color:#fff;margin-bottom:6px;}
-.result-level{font-size:10px;letter-spacing:4px;color:rgba(255,255,255,0.4);margin-bottom:20px;}
-.result-desc{font-size:13px;font-weight:200;color:rgba(255,255,255,0.6);line-height:2;margin-bottom:24px;}
-.result-tags{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:28px;}
-.rtag{font-size:10px;letter-spacing:1px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:20px;padding:5px 14px;color:rgba(255,255,255,0.7);}
-.diary-area{width:calc(100% - 40px);max-width:360px;opacity:0;transition:all 0.8s 0.4s;transform:translateY(20px);}
-.diary-ta{width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:18px;font-size:14px;font-weight:200;font-family:'Noto Serif SC',serif;color:#fff;line-height:2;resize:none;height:120px;outline:none;transition:border-color 0.3s;}
-.diary-ta::placeholder{color:rgba(255,255,255,0.2);}
-.diary-ta:focus{border-color:rgba(255,255,255,0.3);}
-.diary-moods{display:flex;gap:8px;margin-top:12px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;}
-.diary-moods::-webkit-scrollbar{display:none;}
-.dm{flex-shrink:0;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:7px 14px;font-size:11px;font-family:'Noto Serif SC',serif;color:rgba(255,255,255,0.5);cursor:pointer;transition:all 0.25s;white-space:nowrap;}
-.dm.on{background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.3);color:#fff;}
-.diary-save{width:100%;margin-top:12px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:12px;padding:13px;font-size:12px;letter-spacing:3px;color:rgba(255,255,255,0.85);font-family:'Noto Serif SC',serif;cursor:pointer;transition:all 0.3s;}
-.diary-save:active{transform:scale(0.98);}
-.drift-wrap{opacity:0;transition:all 0.8s 0.4s;transform:translateY(20px);width:calc(100% - 40px);max-width:360px;}
-.drift-ocean{height:130px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;transition:all 0.3s;margin-bottom:16px;}
-.drift-ocean:active{transform:scale(0.98);}
-.dw{position:absolute;bottom:0;left:-50%;width:200%;height:50px;background:rgba(255,255,255,0.04);border-radius:40% 40% 0 0;animation:wave 4s ease-in-out infinite;}
-.dw2{animation:wave 5s ease-in-out infinite 1s;opacity:0.5;}
-@keyframes wave{0%,100%{transform:translateX(0) translateY(0)}50%{transform:translateX(5%) translateY(-6px)}}
-.bottle{font-size:36px;animation:drift 3s ease-in-out infinite;margin-bottom:6px;}
-@keyframes drift{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-8px) rotate(5deg)}}
-.drift-hint{font-size:10px;letter-spacing:3px;color:rgba(255,255,255,0.35);}
-.drift-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:18px 18px 44px;position:relative;margin-bottom:10px;}
-.dc-text{font-size:13px;font-weight:200;line-height:1.9;color:rgba(255,255,255,0.7);font-style:italic;margin-bottom:8px;}
-.dc-from{font-size:9px;letter-spacing:3px;color:rgba(255,255,255,0.25);}
-.dc-like{position:absolute;bottom:14px;right:14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:5px 14px;font-size:10px;letter-spacing:1px;color:rgba(255,255,255,0.45);cursor:pointer;font-family:'Noto Serif SC',serif;transition:all 0.25s;}
-.dc-like.on{background:rgba(255,255,255,0.12);color:#fff;}
-#canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.4);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);border-radius:30px;padding:10px 24px;font-size:11px;letter-spacing:2px;color:rgba(255,255,255,0.8);z-index:999;white-space:nowrap;pointer-events:none;animation:fadeUp 0.3s ease;}
-@keyframes fadeUp{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
-#s0{background:linear-gradient(145deg,#0d0d1f 0%,#1a0a2e 100%);}
-#s1{background:linear-gradient(145deg,#071a1a 0%,#0d2e2a 100%);}
-#s2{background:linear-gradient(145deg,#1a0d2e 0%,#2e0d1a 100%);}
-#s3{background:linear-gradient(145deg,#0a1a0d 0%,#0d2e1a 100%);}
-#s4{background:linear-gradient(145deg,#1a1200 0%,#2e2000 100%);}
-#s5{background:linear-gradient(145deg,#0d1a2e 0%,#0a1220 100%);}
-#s6{background:linear-gradient(145deg,#1a0a0a 0%,#2e1a0a 100%);}
-#s7{background:linear-gradient(145deg,#1a0d12 0%,#2e0d1a 100%);}
-#s8{background:linear-gradient(145deg,#060f1a 0%,#0a1a2e 100%);}
-#s9{background:linear-gradient(145deg,#0d0d0d 0%,#1a1a1a 100%);}
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>凌晨三点</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200;300;400&family=ZCOOL+XiaoWei&family=Playfair+Display:ital,wght@1,300;1,500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;background:#070710;}
+canvas{position:fixed;inset:0;z-index:0;}
+#grain{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:0.05;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");mix-blend-mode:overlay;}
+.bar{position:fixed;left:0;right:0;background:#000;z-index:50;pointer-events:none;}
+#bt{top:0;height:clamp(16px,4vh,32px);}
+#bb{bottom:0;height:clamp(16px,4vh,32px);}
+#ov{position:fixed;inset:0;z-index:80;background:#000;opacity:0;pointer-events:none;transition:opacity 0.5s;}
+#ov.on{opacity:1;}
+#stage{position:fixed;inset:0;z-index:10;}
+.sc{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;opacity:0;pointer-events:none;}
+.sc.act{opacity:1;pointer-events:all;}
+#prog{position:fixed;bottom:clamp(4px,1.5vh,10px);left:20px;right:20px;height:1px;background:rgba(255,255,255,0.07);z-index:60;border-radius:1px;overflow:hidden;}
+#pf{height:100%;background:rgba(255,255,255,0.3);border-radius:1px;transition:width 0.9s ease;width:4.16%;}
+#cht{position:fixed;top:clamp(5px,1.5vh,12px);left:18px;font-size:8px;letter-spacing:5px;color:rgba(255,255,255,0.18);z-index:60;font-family:'Noto Serif SC',serif;font-weight:200;}
+#scn{position:fixed;top:clamp(5px,1.5vh,12px);right:18px;font-size:8px;letter-spacing:3px;color:rgba(255,255,255,0.13);z-index:60;font-family:'Noto Serif SC',serif;font-weight:200;}
+.T1{font-family:'ZCOOL XiaoWei',serif;font-size:clamp(48px,14vw,88px);line-height:0.95;color:#fff;letter-spacing:-1px;}
+.T2{font-family:'ZCOOL XiaoWei',serif;font-size:clamp(32px,9.5vw,60px);line-height:1.05;color:#fff;}
+.T3{font-size:clamp(13px,3.5vw,15px);font-weight:200;line-height:2.2;color:rgba(255,255,255,0.48);letter-spacing:0.5px;font-family:'Noto Serif SC',serif;}
+.T3 b{color:rgba(255,255,255,0.86);font-weight:300;}
+.TQ{font-family:'Playfair Display',serif;font-style:italic;font-weight:300;font-size:clamp(16px,4.5vw,24px);color:rgba(255,255,255,0.65);line-height:1.85;}
+.TC{font-size:8px;letter-spacing:5px;color:rgba(255,255,255,0.22);font-weight:200;font-family:'Noto Serif SC',serif;}
+.pill{background:rgba(255,255,255,0.07);border-radius:4px;padding:4px 11px;font-size:8px;letter-spacing:3px;color:rgba(255,255,255,0.3);display:inline-block;font-family:'Noto Serif SC',serif;}
+.stamp{border:1px solid rgba(255,255,255,0.12);padding:5px 13px;font-size:8px;letter-spacing:4px;color:rgba(255,255,255,0.25);display:inline-block;font-family:'Noto Serif SC',serif;}
+.hr{width:28px;height:1px;background:rgba(255,255,255,0.16);}
+.a{opacity:0;transform:translateY(20px);transition:opacity 0.85s ease,transform 0.85s ease;}
+.as{opacity:0;transform:scale(0.9);transition:opacity 0.9s ease,transform 0.9s ease;}
+.af{opacity:0;transition:opacity 0.9s ease;}
+.act .a{opacity:1;transform:translateY(0);}
+.act .as{opacity:1;transform:scale(1);}
+.act .af{opacity:1;}
+.d1{transition-delay:0.1s!important;}
+.d2{transition-delay:0.26s!important;}
+.d3{transition-delay:0.44s!important;}
+.d4{transition-delay:0.62s!important;}
+.d5{transition-delay:0.82s!important;}
+.d6{transition-delay:1.02s!important;}
+.LL{width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;padding:0 clamp(26px,7vw,48px);}
+.LC{width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:0 clamp(22px,6vw,42px);}
+.chs{width:100%;display:flex;flex-direction:column;gap:9px;}
+.ch{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);border-radius:12px;padding:13px 17px;font-size:13px;font-weight:200;color:rgba(255,255,255,0.65);cursor:pointer;text-align:left;transition:all 0.3s;line-height:1.65;position:relative;font-family:'Noto Serif SC',serif;}
+.ch.on{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.28);color:#fff;}
+.ch.on::after{content:'';position:absolute;right:13px;top:50%;transform:translateY(-50%);width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.55);}
+.ch.dim{opacity:0.18;pointer-events:none;}
+.lr{display:flex;align-items:center;gap:14px;}
+.lb{background:none;border:1px solid rgba(255,255,255,0.14);border-radius:30px;padding:7px 20px;font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.38);font-family:'Noto Serif SC',serif;cursor:pointer;transition:all 0.3s;}
+.lb.on{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.28);color:#fff;}
+.lc{font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.18);font-family:'Noto Serif SC',serif;}
+.nx{background:none;border:none;font-size:9px;letter-spacing:4px;color:rgba(255,255,255,0.28);font-family:'Noto Serif SC',serif;cursor:pointer;padding:10px 0;display:flex;align-items:center;gap:8px;transition:color 0.3s;opacity:0;pointer-events:none;}
+.nx.on{opacity:1;pointer-events:all;}
+.toast{position:fixed;bottom:44px;left:50%;transform:translateX(-50%);background:rgba(8,8,16,0.92);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.06);border-radius:30px;padding:8px 20px;font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.55);z-index:999;white-space:nowrap;pointer-events:none;font-family:'Noto Serif SC',serif;animation:tin 0.3s ease;}
+@keyframes tin{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
 </style>
 </head>
 <body>
-<canvas id="canvas"></canvas>
-<div id="dots"></div>
-<div id="swipe-hint">向上滑动 ↑</div>
-<div id="slides">
-<div class="slide" id="s0" style="top:0">
-  <div class="tag">EMOTIONAL WEATHER · 情绪天气</div>
-  <div class="big-title">你今天<br>怎么了</div>
-  <div class="sub-text">8个问题<br>帮你找到今天的情绪频率</div>
-  <div class="choices"><div class="choice" onclick="goSlide(1)" style="text-align:center;letter-spacing:2px;">开始今天的测试 →</div></div>
-</div>
-<div class="slide" id="s1" style="top:100vh">
-  <div class="tag">第一步 · 直觉选择</div>
-  <div class="big-title" style="font-size:clamp(28px,8vw,44px);">现在这一刻<br>你更像哪个</div>
-  <div class="choices" id="mood-choices">
-    <div class="choice" onclick="pickMood(this,'cloudy')">🌫️ &nbsp;有点沉，说不上哪里不对</div>
-    <div class="choice" onclick="pickMood(this,'storm')">⛈️ &nbsp;心里有什么在压着</div>
-    <div class="choice" onclick="pickMood(this,'rain')">🌧️ &nbsp;莫名想哭，没有理由</div>
-    <div class="choice" onclick="pickMood(this,'soft')">⛅ &nbsp;还好，就是有点空</div>
-    <div class="choice" onclick="pickMood(this,'clear')">☀️ &nbsp;今天难得，心情还不错</div>
-    <div class="choice" onclick="pickMood(this,'numb')">🪨 &nbsp;麻木，什么都感觉不到</div>
-  </div>
-</div>
-<div class="slide" id="s2" style="top:200vh">
-  <div style="position:absolute;top:0;left:0;right:0;height:3px;background:rgba(255,255,255,0.06);"><div style="height:100%;background:rgba(255,255,255,0.25);width:25%;"></div></div>
-  <div class="tag">场景 01 · 📱 手机响了</div>
-  <div class="big-title" style="font-size:clamp(22px,6vw,34px);">陌生号码来电<br>你第一反应是</div>
-  <div class="choices" id="q1-choices">
-    <div class="choice" onclick="pickQ(this,'q1',0,'nb2')">直接接，有什么事说</div>
-    <div class="choice" onclick="pickQ(this,'q1',1,'nb2')">看看是哪里再决定</div>
-    <div class="choice" onclick="pickQ(this,'q1',2,'nb2')">等它挂断，搜索号码再回</div>
-    <div class="choice" onclick="pickQ(this,'q1',3,'nb2')">不接也不查，假装不存在</div>
-  </div>
-  <button class="next-btn" id="nb2" onclick="goSlide(3)">下一个场景 →</button>
-</div>
-<div class="slide" id="s3" style="top:300vh">
-  <div style="position:absolute;top:0;left:0;right:0;height:3px;background:rgba(255,255,255,0.06);"><div style="height:100%;background:rgba(255,255,255,0.25);width:50%;"></div></div>
-  <div class="tag">场景 02 · 🍽️ 聚餐结束</div>
-  <div class="big-title" style="font-size:clamp(22px,6vw,34px);">三小时饭局散场<br>回家路上你感觉</div>
-  <div class="choices" id="q2-choices">
-    <div class="choice" onclick="pickQ(this,'q2',0,'nb3')">还没尽兴，还想再聊</div>
-    <div class="choice" onclick="pickQ(this,'q2',1,'nb3')">还好，有点累了</div>
-    <div class="choice" onclick="pickQ(this,'q2',2,'nb3')">终于可以一个人了，如释重负</div>
-    <div class="choice" onclick="pickQ(this,'q2',3,'nb3')">开始复盘今天说的每一句话</div>
-  </div>
-  <button class="next-btn" id="nb3" onclick="goSlide(4)">下一个场景 →</button>
-</div>
-<div class="slide" id="s4" style="top:400vh">
-  <div style="position:absolute;top:0;left:0;right:0;height:3px;background:rgba(255,255,255,0.06);"><div style="height:100%;background:rgba(255,255,255,0.25);width:75%;"></div></div>
-  <div class="tag">场景 03 · 💬 群里@你了</div>
-  <div class="big-title" style="font-size:clamp(22px,6vw,34px);">工作群问你问题<br>你会</div>
-  <div class="choices" id="q3-choices">
-    <div class="choice" onclick="pickQ(this,'q3',0,'nb4')">马上回复</div>
-    <div class="choice" onclick="pickQ(this,'q3',1,'nb4')">想好措辞再发</div>
-    <div class="choice" onclick="pickQ(this,'q3',2,'nb4')">先看别人怎么说，再补一句</div>
-    <div class="choice" onclick="pickQ(this,'q3',3,'nb4')">假装没看见，等话题过去</div>
-  </div>
-  <button class="next-btn" id="nb4" onclick="goSlide(5)">下一个场景 →</button>
-</div>
-<div class="slide" id="s5" style="top:500vh">
-  <div style="position:absolute;top:0;left:0;right:0;height:3px;background:rgba(255,255,255,0.06);"><div style="height:100%;background:rgba(255,255,255,0.25);width:100%;"></div></div>
-  <div class="tag">场景 04 · 🛗 等电梯</div>
-  <div class="big-title" style="font-size:clamp(22px,6vw,34px);">和不太熟的同事<br>一起等电梯</div>
-  <div class="choices" id="q4-choices">
-    <div class="choice" onclick="pickQ(this,'q4',0,'nb5')">自然地聊起来</div>
-    <div class="choice" onclick="pickQ(this,'q4',1,'nb5')">礼貌性微笑，说几句</div>
-    <div class="choice" onclick="pickQ(this,'q4',2,'nb5')">低头看手机，其实屏幕是黑的</div>
-    <div class="choice" onclick="pickQ(this,'q4',3,'nb5')">直接走楼梯</div>
-  </div>
-  <button class="next-btn" id="nb5" onclick="showResult()">查看我的结果 →</button>
-</div>
-<div class="slide" id="s6" style="top:600vh">
-  <div class="result-wrap" id="result-wrap">
-    <div class="result-badge" id="r-badge"></div>
-    <div class="result-title" id="r-title"></div>
-    <div class="result-level" id="r-level"></div>
-    <div class="result-desc" id="r-desc"></div>
-    <div class="result-tags" id="r-tags"></div>
-    <button class="next-btn show" onclick="goSlide(7)" style="margin-top:0;">记录今天的心情 →</button>
-  </div>
-</div>
-<div class="slide" id="s7" style="top:700vh">
-  <div class="tag">情绪日记 · 写下来就轻一点</div>
-  <div class="big-title" style="font-size:clamp(26px,7vw,40px);margin-bottom:16px;">今天<br>有什么话</div>
-  <div class="diary-area">
-    <textarea class="diary-ta" id="diary-ta" placeholder="不用整理，随便写……"></textarea>
-    <div class="diary-moods" id="diary-moods"></div>
-    <button class="diary-save" onclick="saveDiary()">悄悄记下来 →</button>
-  </div>
-</div>
-<div class="slide" id="s8" style="top:800vh">
-  <div class="tag">情绪漂流瓶 · 知道有人懂</div>
-  <div class="big-title" style="font-size:clamp(26px,7vw,40px);margin-bottom:16px;">陌生人<br>的碎碎念</div>
-  <div class="drift-wrap">
-    <div class="drift-ocean" onclick="throwBottle()">
-      <div class="dw"></div><div class="dw dw2"></div>
-      <div class="bottle">🫙</div>
-      <div class="drift-hint">点击扔出你的漂流瓶</div>
-    </div>
-    <div id="drift-list"></div>
-  </div>
-</div>
-<div class="slide" id="s9" style="top:900vh">
-  <div class="tag">· 内向星球 ·</div>
-  <div class="big-title">安静<br>不是没话说</div>
-  <div class="sub-text">是因为值得说的人<br>还没出现</div>
-  <div class="choices"><div class="choice" onclick="restart()" style="text-align:center;letter-spacing:2px;">重新来一次 ↺</div></div>
-  <div style="position:absolute;bottom:52px;font-size:9px;letter-spacing:4px;color:rgba(255,255,255,0.2);">情绪天气 · 每日播报</div>
-</div>
+<canvas id="cv"></canvas>
+<div id="grain"></div>
+<div class="bar" id="bt"></div>
+<div class="bar" id="bb"></div>
+<div id="ov"></div>
+<div id="cht">凌晨三点</div>
+<div id="scn">01 / 24</div>
+<div id="prog"><div id="pf"></div></div>
+<div id="stage">
+<div class="sc act" id="sc0" data-ch="片头"><div class="LC"><div class="TC af d1" style="margin-bottom:44px;">A FILM ABOUT YOU</div><div class="T1 as d2" style="margin-bottom:6px;">凌晨</div><div class="T1 as d3" style="color:rgba(255,255,255,0.3);margin-bottom:36px;">三点</div><div class="hr af d4" style="margin:0 auto 22px;"></div><div class="TC af d5">一部关于你的电影</div><button class="nx on af d6" style="margin-top:44px;justify-content:center;" onclick="go(1)">开始放映 →</button></div></div>
+<div class="sc" id="sc1" data-ch="01 · 失眠"><div class="LL"><div class="pill a d1" style="margin-bottom:22px;">凌晨 03:17</div><div class="T2 a d2" style="margin-bottom:22px;">睡不着<br>但也不想<br>做任何事</div><div class="T3 a d3" style="max-width:310px;margin-bottom:26px;">就是躺着<br>刷了一遍又一遍什么都没看进去<br><b>脑子里什么都有，又什么都没有</b></div><div class="lr a d4"><button class="lb" onclick="like(this)">我也是</button><span class="lc">8.4k</span></div></div></div>
+<div class="sc" id="sc2" data-ch="01 · 失眠"><div class="LC"><div class="TC af d1" style="margin-bottom:26px;">凌晨的脑子会把一切放大</div><div class="TQ as d2" style="max-width:300px;margin-bottom:28px;">"白天说错的一句话<br>凌晨三点还在复盘"</div><div class="hr af d3" style="margin:0 auto 28px;"></div><div class="TQ as d4" style="max-width:300px;opacity:0.55;">"三年前的尴尬<br>突然袭来"</div><div class="lr af d5" style="justify-content:center;margin-top:26px;"><button class="lb" onclick="like(this)">我也是</button><span class="lc">12.1k</span></div></div></div>
+<div class="sc" id="sc3" data-ch="01 · 失眠" data-i="1"><div class="LL"><div class="TC a d1" style="margin-bottom:18px;">选你的版本</div><div class="T2 a d2" style="font-size:clamp(24px,7vw,40px);margin-bottom:22px;">凌晨<br>在想什么</div><div class="chs a d3" id="g3"><div class="ch" onclick="pick('g3',this,4)">某件说出口就能解决但我选择憋着的事</div><div class="ch" onclick="pick('g3',this,4)">一段关系在变淡，不知道该不该挽留</div><div class="ch" onclick="pick('g3',this,4)">钱的事。一直是钱的事。</div><div class="ch" onclick="pick('g3',this,4)">什么都没想，就是睡不着</div></div><button class="nx d4" id="n3" onclick="go(4)" style="margin-top:18px;">继续 →</button></div></div>
+<div class="sc" id="sc4" data-ch="02 · 钱" data-auto="2600"><div class="LC"><div class="stamp af d1" style="margin-bottom:22px;">CHAPTER TWO</div><div class="T1 as d2">钱</div><div class="TC af d3" style="margin-top:14px;">关于体面与代价</div></div></div>
+<div class="sc" id="sc5" data-ch="02 · 钱"><div class="LL"><div class="pill a d1" style="margin-bottom:22px;">关于钱</div><div class="T2 a d2" style="margin-bottom:22px;">没有钱<br>但要<br>维持体面</div><div class="T3 a d3" style="max-width:310px;margin-bottom:26px;">AA的时候在心里算了三遍<br>买东西先看价格再装作随便看看<br><b>穷是真穷，但不能让人看出来穷</b><br><br>这很累，但停不下来</div><div class="lr a d4"><button class="lb" onclick="like(this)">我也是</button><span class="lc">21.3k</span></div></div></div>
+<div class="sc" id="sc6" data-ch="02 · 钱"><div class="LC"><div class="TQ as d1" style="max-width:290px;margin-bottom:28px;">"月底还剩三天<br>但工资还有五天才发<br>数学题"</div><div class="hr af d2" style="margin:0 auto 28px;"></div><div class="TQ as d3" style="max-width:290px;font-size:clamp(14px,4vw,20px);opacity:0.5;">"不是买不起<br>是觉得<br>不值得为自己花"</div><div class="lr af d4" style="justify-content:center;margin-top:26px;"><button class="lb" onclick="like(this)">我也是</button><span class="lc">16.7k</span></div></div></div>
+<div class="sc" id="sc7" data-ch="02 · 钱" data-i="1"><div class="LL"><div class="TC a d1" style="margin-bottom:18px;">说实话</div><div class="T2 a d2" style="font-size:clamp(24px,7vw,40px);margin-bottom:22px;">你和钱<br>的关系</div><div class="chs a d3" id="g7"><div class="ch" onclick="pick('g7',this,8)">钱是安全感，没钱就焦虑</div><div class="ch" onclick="pick('g7',this,8)">赚多少花多少，活在当下</div><div class="ch" onclick="pick('g7',this,8)">舍不得花在自己身上，但愿意请别人</div><div class="ch" onclick="pick('g7',this,8)">不谈钱，谈钱伤感情（包括和自己）</div></div><button class="nx d4" id="n7" onclick="go(8)" style="margin-top:18px;">继续 →</button></div></div>
+<div class="sc" id="sc8" data-ch="03 · 漂泊" data-auto="2600"><div class="LC"><div class="stamp af d1" style="margin-bottom:22px;">CHAPTER THREE</div><div class="T1 as d2">漂泊</div><div class="TC af d3" style="margin-top:14px;">关于城市与归处</div></div></div>
+<div class="sc" id="sc9" data-ch="03 · 漂泊"><div class="LL"><div class="pill a d1" style="margin-bottom:22px;">在一个不算家的城市</div><div class="T2 a d2" style="margin-bottom:22px;">这里有我<br>但我<br>不属于这里</div><div class="T3 a d3" style="max-width:310px;margin-bottom:26px;">租的房子住了两年<br>还是不会说"我回家了"<br>只会说"我到了"<br><br><b>家是一个动词，我还在找它的主语</b></div><div class="lr a d4"><button class="lb" onclick="like(this)">我也是</button><span class="lc">18.9k</span></div></div></div>
+<div class="sc" id="sc10" data-ch="03 · 漂泊"><div class="LC"><div class="TC af d1" style="margin-bottom:28px;">有一种孤独叫</div><div class="T2 as d2" style="font-size:clamp(26px,8vw,50px);margin-bottom:28px;">生病了<br>不知道<br>打给谁</div><div class="hr af d3" style="margin:0 auto 22px;"></div><div class="T3 af d4" style="font-size:12px;">翻了半天通讯录<br>觉得每个人都不合适</div><div class="lr af d5" style="justify-content:center;margin-top:26px;"><button class="lb" onclick="like(this)">我也是</button><span class="lc">24.6k</span></div></div></div>
+<div class="sc" id="sc11" data-ch="03 · 漂泊" data-i="1"><div class="LL"><div class="TC a d1" style="margin-bottom:18px;">此刻你的城市</div><div class="T2 a d2" style="font-size:clamp(24px,7vw,40px);margin-bottom:22px;">和这座城市<br>的关系</div><div class="chs a d3" id="g11"><div class="ch" onclick="pick('g11',this,12)">在这里打拼，但心里没有归属感</div><div class="ch" onclick="pick('g11',this,12)">想回家，但回去了又觉得憋屈</div><div class="ch" onclick="pick('g11',this,12)">已经习惯了漂泊，哪里都行</div><div class="ch" onclick="pick('g11',this,12)">就在老家，但心在别处</div></div><button class="nx d4" id="n11" onclick="go(12)" style="margin-top:18px;">继续 →</button></div></div>
+<div class="sc" id="sc12" data-ch="04 · 消失" data-auto="2600"><div class="LC"><div class="stamp af d1" style="margin-bottom:22px;">CHAPTER FOUR</div><div class="T1 as d2">消失</div><div class="TC af d3" style="margin-top:14px;">关于那些没有说再见的人</div></div></div>
+<div class="sc" id="sc13" data-ch="04 · 消失"><div class="LL"><div class="pill a d1" style="margin-bottom:22px;">关于消失</div><div class="T2 a d2" style="margin-bottom:22px;">有些人<br>没有说再见<br>就不见了</div><div class="T3 a d3" style="max-width:310px;margin-bottom:26px;">不是吵架，不是决裂<br>就是慢慢地，回复变少了<br><b>某一天发现，已经很久没联系了</b><br><br>也不知道该不该打破这个沉默</div><div class="lr a d4"><button class="lb" onclick="like(this)">我也是</button><span class="lc">19.2k</span></div></div></div>
+<div class="sc" id="sc14" data-ch="04 · 消失"><div class="LC"><div class="TQ as d1" style="max-width:290px;margin-bottom:30px;">"有没有一种可能<br>你以为是互相淡出<br>其实只有你一个人在挽留"</div><div class="TQ as d2" style="max-width:290px;font-size:clamp(14px,4vw,20px);opacity:0.5;">"后来我学会了<br>不主动，就不联系"</div><div class="lr af d3" style="justify-content:center;margin-top:26px;"><button class="lb" onclick="like(this)">我也是</button><span class="lc">22.5k</span></div></div></div>
+<div class="sc" id="sc15" data-ch="04 · 消失" data-i="1"><div class="LL"><div class="TC a d1" style="margin-bottom:18px;">那个消失的人</div><div class="T2 a d2" style="font-size:clamp(24px,7vw,40px);margin-bottom:22px;">你选择<br>怎么对待</div><div class="chs a d3" id="g15"><div class="ch" onclick="pick('g15',this,16)">主动联系，哪怕可能很尴尬</div><div class="ch" onclick="pick('g15',this,16)">等对方先开口，不然就算了</div><div class="ch" onclick="pick('g15',this,16)">已经想清楚了，有些人缘分到了</div><div class="ch" onclick="pick('g15',this,16)">还没想好，就这样耗着</div></div><button class="nx d4" id="n15" onclick="go(16)" style="margin-top:18px;">继续 →</button></div></div>
+<div class="sc" id="sc16" data-ch="05 · 努力" data-auto="2600"><div class="LC"><div class="stamp af d1" style="margin-bottom:22px;">CHAPTER FIVE</div><div class="T1 as d2">努力</div><div class="TC af d3" style="margin-top:14px;">关于想努力却又躺平的自己</div></div></div>
+<div class="sc" id="sc17" data-ch="05 · 努力"><div class="LL"><div class="pill a d1" style="margin-bottom:22px;">关于努力</div><div class="T2 a d2" style="margin-bottom:22px;">想努力<br>但不知道<br>为什么努力</div><div class="T3 a d3" style="max-width:310px;margin-bottom:26px;">打开了备忘录，写了三行，关掉<br>设了闹钟，按掉，再睡一小时<br>买了课，没看<br><br><b>不是懒，是不知道努力到底是为了什么</b></div><div class="lr a d4"><button class="lb" onclick="like(this)">我也是</button><span class="lc">31.4k</span></div></div></div>
+<div class="sc" id="sc18" data-ch="05 · 努力"><div class="LC"><div class="TQ as d1" style="max-width:290px;margin-bottom:28px;">"焦虑的时候收藏很多东西<br>平静的时候一个都不打开"</div><div class="hr af d2" style="margin:0 auto 28px;"></div><div class="TQ as d3" style="max-width:290px;opacity:0.5;">"既不想接受平庸<br>又没有改变的勇气<br>这个中间地带很难受"</div><div class="lr af d4" style="justify-content:center;margin-top:26px;"><button class="lb" onclick="like(this)">我也是</button><span class="lc">27.8k</span></div></div></div>
+<div class="sc" id="sc19" data-ch="05 · 努力" data-i="1"><div class="LL"><div class="TC a d1" style="margin-bottom:18px;">最近的你</div><div class="T2 a d2" style="font-size:clamp(24px,7vw,40px);margin-bottom:22px;">努力这件事<br>你现在怎样</div><div class="chs a d3" id="g19"><div class="ch" onclick="pick('g19',this,20)">在努力，但看不到结果，快撑不住了</div><div class="ch" onclick="pick('g19',this,20)">躺平了，努不努力好像也差不多</div><div class="ch" onclick="pick('g19',this,20)">想努力，但不知道方向，很迷茫</div><div class="ch" onclick="pick('g19',this,20)">状态还行，就是容易焦虑</div></div><button class="nx d4" id="n19" onclick="go(20)" style="margin-top:18px;">继续 →</button></div></div>
+<div class="sc" id="sc20" data-ch="06 · 来处" data-auto="2600"><div class="LC"><div class="stamp af d1" style="margin-bottom:22px;">CHAPTER SIX</div><div class="T1 as d2">来处</div><div class="TC af d3" style="margin-top:14px;">关于你从哪里来</div></div></div>
+<div class="sc" id="sc21" data-ch="06 · 来处"><div class="LL"><div class="pill a d1" style="margin-bottom:22px;">关于原生家庭</div><div class="T2 a d2" style="margin-bottom:22px;">爱他们<br>也被他们<br>困住</div><div class="T3 a d3" style="max-width:310px;margin-bottom:26px;">说不清楚是爱还是责任<br>心疼他们，也因为他们受伤<br>想逃离，又觉得愧疚<br><br><b>这是一道没有正确答案的题</b><br>但每天都要交卷</div><div class="lr a d4"><button class="lb" onclick="like(this)">我也是</button><span class="lc">29.1k</span></div></div></div>
+<div class="sc" id="sc22" data-ch="06 · 来处"><div class="LC"><div class="TQ as d1" style="max-width:290px;margin-bottom:28px;">"长大了才发现<br>父母也是第一次<br>做父母"</div><div class="hr af d2" style="margin:0 auto 28px;"></div><div class="TQ as d3" style="max-width:290px;opacity:0.5;">"理解他们<br>但有些伤<br>还是需要自己慢慢愈合"</div><div class="lr af d4" style="justify-content:center;margin-top:26px;"><button class="lb" onclick="like(this)">我也是</button><span class="lc">33.7k</span></div></div></div>
+<div class="sc" id="sc23" data-ch="尾声"><div class="LC"><div class="TC af d1" style="margin-bottom:44px;">· 凌晨三点 · 完 ·</div><div class="T2 as d2" style="font-size:clamp(26px,8vw,50px);margin-bottom:28px;">你不需要<br>解释<br>自己</div><div class="hr af d3" style="margin:0 auto 24px;"></div><div class="T3 af d4" style="max-width:240px;font-size:12px;text-align:center;">凌晨三点想这些的人<br>都不是矫情<br>只是<b>感受得太清晰</b>了</div><div class="lr af d5" style="justify-content:center;margin-top:28px;"><button class="lb" onclick="like(this)">我也是</button><span class="lc">44.2k</span></div><button class="nx on af d6" onclick="go(0)" style="margin-top:24px;justify-content:center;">重新放映 ↺</button></div></div>
 </div>
 <script>
-const TOTAL=10;
-let cur=0,score=0,selectedMood='cloudy',answers={},diaryMood=null;
-const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d'),particles=[];
-const slideColors=['#2a2a6a','#0a4a4a','#4a1a6a','#0a4a2a','#4a3a00','#1a3a6a','#6a1a1a','#4a0a2a','#0a2a4a','#1a1a1a'];
-function resizeCanvas(){canvas.width=innerWidth;canvas.height=innerHeight;}
-resizeCanvas();window.addEventListener('resize',resizeCanvas);
-class P{constructor(){this.reset();}reset(){this.x=Math.random()*canvas.width;this.y=Math.random()*canvas.height;this.r=Math.random()*1.5+0.3;this.vx=(Math.random()-.5)*.3;this.vy=(Math.random()-.5)*.3;this.a=Math.random()*.4+.05;this.life=Math.random()*200+100;this.ml=this.life;this.c=slideColors[cur]||'#4a4a7a';}step(){this.x+=this.vx;this.y+=this.vy;this.life--;if(this.life<=0)this.reset();}draw(){const a=(this.life/this.ml)*this.a;ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle=this.c+Math.round(a*255).toString(16).padStart(2,'0');ctx.fill();}}
-for(let i=0;i<80;i++)particles.push(new P());
-function animBg(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.step();p.draw();});requestAnimationFrame(animBg);}
+var TOTAL=24,cur=0,busy=false,autoT=null;
+var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+function rsz(){cv.width=innerWidth;cv.height=innerHeight;}rsz();window.addEventListener('resize',rsz);
+var pal=[['#070710','#0e0818'],['#05080f','#0a1018'],['#080510','#100818'],['#070a05','#0a1008'],['#100a04','#1a1008'],['#0f0908','#180e08'],['#080808','#101010'],['#0d0508','#180808'],['#050810','#081018'],['#080810','#10101a'],['#060a08','#0a1008'],['#080508','#100808'],['#080508','#100808'],['#0a0608','#150808'],['#060608','#0a0a10'],['#060808','#0a0c10'],['#080608','#100a08'],['#080606','#120808'],['#060606','#0e0606'],['#080806','#10100a'],['#040808','#080e0e'],['#080608','#100a08'],['#060606','#0c0808'],['#030303','#080808']];
+var acc=['#1a1a4a','#1a2a4a','#1a1a3a','#1a2a1a','#3a2a08','#2a1a10','#1a1a1a','#2a0a10','#0a1a3a','#1a1a3a','#0a1a0a','#1a0a0a','#1a0a0a','#2a0808','#0a0a1a','#080a1a','#0a1208','#100808','#0c0808','#0c0c08','#081010','#0a0a08','#080808','#040404'];
+var cBg=['#070710','#0e0818'],tBg=['#070710','#0e0818'],lt=1,pts=[];
+function h2r(h){return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];}
+function r2h(r,g,b){return'#'+[r,g,b].map(function(v){return Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0');}).join('');}
+function lC(a,b,t){var ra=h2r(a),rb=h2r(b);return r2h(ra[0]+(rb[0]-ra[0])*t,ra[1]+(rb[1]-ra[1])*t,ra[2]+(rb[2]-ra[2])*t);}
+function Pt(){this.x=Math.random()*cv.width;this.y=Math.random()*cv.height;this.r=Math.random()*0.9+0.2;this.vx=(Math.random()-0.5)*0.18;this.vy=(Math.random()-0.5)*0.18;this.a=Math.random()*0.28+0.04;this.life=Math.random()*280+160;this.ml=this.life;this.ci=0;}
+Pt.prototype.step=function(){this.x+=this.vx;this.y+=this.vy;this.life--;if(this.life<=0){this.x=Math.random()*cv.width;this.y=Math.random()*cv.height;this.life=this.ml;this.ci=cur;}};
+Pt.prototype.draw=function(){var a=(this.life/this.ml)*this.a;var c=acc[this.ci]||'#1a1a4a';ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle=c+Math.round(a*255).toString(16).padStart(2,'0');ctx.fill();};
+for(var i=0;i<65;i++)pts.push(new Pt());
+function animBg(){if(lt<1){lt=Math.min(1,lt+0.016);cBg=[lC(cBg[0],tBg[0],lt),lC(cBg[1],tBg[1],lt)];}ctx.clearRect(0,0,cv.width,cv.height);var g=ctx.createLinearGradient(0,0,cv.width*0.5,cv.height);g.addColorStop(0,cBg[0]);g.addColorStop(1,cBg[1]);ctx.fillStyle=g;ctx.fillRect(0,0,cv.width,cv.height);for(var i=0;i<pts.length;i++){pts[i].step();pts[i].draw();}requestAnimationFrame(animBg);}
 animBg();
-function goSlide(n){if(n<0||n>=TOTAL)return;cur=n;document.getElementById('slides').style.transform=`translateY(-${n*100}vh)`;document.querySelectorAll('.slide').forEach((s,i)=>s.classList.toggle('in',i===n));document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('on',i===n));particles.forEach(p=>p.c=slideColors[n]||'#4a4a7a');document.getElementById('swipe-hint').style.opacity=n===TOTAL-1?'0':'1';}
-const dotsEl=document.getElementById('dots');
-for(let i=0;i<TOTAL;i++){const d=document.createElement('div');d.className='dot'+(i===0?' on':'');d.onclick=()=>goSlide(i);dotsEl.appendChild(d);}
-let touchY=0;
-document.addEventListener('touchstart',e=>{touchY=e.touches[0].clientY;},{passive:true});
-document.addEventListener('touchend',e=>{const dy=touchY-e.changedTouches[0].clientY;if(Math.abs(dy)>50){if(dy>0&&cur<TOTAL-1)goSlide(cur+1);else if(dy<0&&cur>0)goSlide(cur-1);}},{passive:true});
-const moods={cloudy:{name:'多云转阴',icon:'🌫️',bg:'linear-gradient(145deg,#1a1a3a 0%,#2a2a5a 100%)',desc:'今天的心情像窗外的天，说不上哪里不对，就是有点沉。不需要解释，这也是一种真实的状态。'},storm:{name:'内心有雷',icon:'⛈️',bg:'linear-gradient(145deg,#1a0a2e 0%,#2a0a3a 100%)',desc:'有些话压在喉咙里，说不出来，也不知道说给谁听。但这种压着的感觉，值得被认真对待。'},rain:{name:'悄悄在下雨',icon:'🌧️',bg:'linear-gradient(145deg,#060f1a 0%,#0a1a2e 100%)',desc:'没什么大事，就是想哭，也不知道为什么。允许自己哭，哭完会好一点点。'},soft:{name:'云朵微晴',icon:'⛅',bg:'linear-gradient(145deg,#1a1208 0%,#2a2010 100%)',desc:'今天还好，不算开心，但也没有很难过。这种平静，其实也是一种恩赐。'},clear:{name:'难得放晴',icon:'☀️',bg:'linear-gradient(145deg,#1a1800 0%,#2a2800 100%)',desc:'今天莫名心情还不错，这种感觉很难得，值得好好记住。'},numb:{name:'感觉麻木',icon:'🪨',bg:'linear-gradient(145deg,#141414 0%,#1e1e1e 100%)',desc:'不是难过，不是开心，只是什么都感觉不到。麻木有时候是情绪过载后的自我保护。'}};
-const results=[{min:0,max:3,badge:'🌟',title:'边缘i人',level:'I/E 边界游侠',desc:'你游走在内向和外向之间，这种弹性是很宝贵的能力。',tags:['社交弹性强','随缘社交','状态影响型']},{min:4,max:7,badge:'🍃',title:'轻度i人',level:'懂得独处的社交达人',desc:'你能应对社交，但需要独处补充能量。慢热，但值得等待。',tags:['选择性社交','慢热型','内藏话痨']},{min:8,max:11,badge:'🌙',title:'标准i人',level:'内向星球正式居民',desc:'在心里彩排过一百遍的事也不一定说出口，但你对信任的人无比真诚。',tags:['深度优先','内心戏丰富','极致忠诚']},{min:12,max:16,badge:'🪐',title:'深度i人',level:'i人宇宙最深处的存在',desc:'你有极其丰富的内心世界，只是不轻易对外开放。电梯走楼梯那种。',tags:['独处艺术家','高度敏感','内心宇宙级']}];
-const driftData=[{text:'今天哭了，但不知道为什么。就是突然眼眶酸了。',from:'某个雨天的人'},{text:'发现自己很久没有真正开心过了，也不是难过，就是……平的。',from:'城市某处的窗边'},{text:'今天一个人吃了顿好吃的，突然觉得一个人也挺好的。',from:'路过的某个角落'},{text:'想说的话太多，但每次开口又觉得算了。',from:'压着很多话的人'}];
-function pickMood(el,id){selectedMood=id;document.querySelectorAll('#mood-choices .choice').forEach(c=>{c.classList.toggle('picked',c===el);c.classList.toggle('dim',c!==el);});setTimeout(()=>{document.getElementById('s6').style.background=moods[id].bg;goSlide(2);},500);}
-function pickQ(el,qid,s,nbid){if(answers[qid]!==undefined)return;answers[qid]=s;score+=s;el.parentElement.querySelectorAll('.choice').forEach(c=>{c.classList.toggle('picked',c===el);c.classList.toggle('dim',c!==el);c.onclick=null;});document.getElementById(nbid).classList.add('show');}
-function showResult(){const r=results.find(x=>score>=x.min&&score<=x.max)||results[results.length-1];const m=moods[selectedMood];document.getElementById('r-badge').textContent=m.icon;document.getElementById('r-title').textContent=m.name+' · '+r.title;document.getElementById('r-level').textContent=r.level;document.getElementById('r-desc').textContent=m.desc+' '+r.desc;document.getElementById('r-tags').innerHTML=r.tags.map(t=>`<span class="rtag">${t}</span>`).join('');goSlide(6);}
-function buildDiaryMoods(){document.getElementById('diary-moods').innerHTML=Object.entries(moods).map(([id,m])=>`<div class="dm" onclick="selectDM('${id}',this)">${m.icon} ${m.name}</div>`).join('');}
-function selectDM(id,el){diaryMood=id;document.querySelectorAll('.dm').forEach(d=>d.classList.toggle('on',d===el));}
-function saveDiary(){const txt=document.getElementById('diary-ta').value.trim();if(!txt){document.getElementById('diary-ta').focus();return;}showToast('已悄悄记下来 🌿');document.getElementById('diary-ta').value='';document.querySelectorAll('.dm').forEach(d=>d.classList.remove('on'));diaryMood=null;setTimeout(()=>goSlide(8),800);}
-function renderDrift(){document.getElementById('drift-list').innerHTML=driftData.map(d=>`<div class="drift-card"><div class="dc-text">"${d.text}"</div><div class="dc-from">— ${d.from}</div><button class="dc-like" onclick="this.classList.toggle('on');this.textContent=this.classList.contains('on')?'已共鸣 ✓':'我也是'">我也是</button></div>`).join('');}
-function throwBottle(){showToast('一个装着今天的瓶子漂出去了 🫙');driftData.unshift({text:'今天没什么特别的，就是想把今天记下来。',from:'刚刚扔出来的你'});renderDrift();}
-function showToast(msg){document.querySelectorAll('.toast').forEach(t=>t.remove());const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2200);}
-function restart(){score=0;answers={};selectedMood='cloudy';diaryMood=null;goSlide(0);}
-buildDiaryMoods();renderDrift();goSlide(0);
+var ov=document.getElementById('ov');
+function go(n){if(busy||n<0||n>=TOTAL)return;if(autoT){clearTimeout(autoT);autoT=null;}busy=true;ov.style.transition='opacity 0.42s ease';ov.style.opacity='1';setTimeout(function(){var scenes=document.querySelectorAll('.sc');for(var i=0;i<scenes.length;i++)scenes[i].classList.remove('act');cur=n;var sc=document.getElementById('sc'+n);if(sc){sc.classList.add('act');var ch=sc.getAttribute('data-ch')||'';document.getElementById('cht').textContent=ch;document.getElementById('scn').textContent=String(n+1).padStart(2,'0')+' / '+String(TOTAL).padStart(2,'0');document.getElementById('pf').style.width=((n+1)/TOTAL*100)+'%';if(pal[n]){tBg=[pal[n][0],pal[n][1]];lt=0;}for(var j=0;j<pts.length;j++){pts[j].ci=n;pts[j].life=1;}var auto=sc.getAttribute('data-auto');if(auto){autoT=setTimeout(function(){if(!busy)go(cur+1);},parseInt(auto));}}ov.style.transition='opacity 0.52s ease';ov.style.opacity='0';setTimeout(function(){busy=false;},580);},440);}
+function pick(gid,el,nextN){var g=document.getElementById(gid);if(!g)return;if(g.querySelector('.on'))return;var chs=g.querySelectorAll('.ch');for(var i=0;i<chs.length;i++){if(chs[i]===el)chs[i].classList.add('on');else chs[i].classList.add('dim');chs[i].onclick=null;}var num=gid.slice(1);var nb=document.getElementById('n'+num);if(nb)nb.classList.add('on');var n=nextN;setTimeout(function(){if(cur===parseInt(num))go(n);},620);}
+function like(btn){btn.classList.toggle('on');var span=btn.nextElementSibling;if(!span)return;var m=span.textContent.match(/([\d.]+)/);if(!m)return;var n=parseFloat(m[1]);n=btn.classList.contains('on')?n+0.1:n-0.1;span.textContent=n.toFixed(1)+'k';}
+function toast(msg){var old=document.querySelectorAll('.toast');for(var i=0;i<old.length;i++)old[i].remove();var t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.remove();},2000);}
+var ty=0,tlocked=false;
+document.addEventListener('touchstart',function(e){ty=e.touches[0].clientY;},{passive:true});
+document.addEventListener('touchend',function(e){if(busy||tlocked)return;var dy=ty-e.changedTouches[0].clientY;if(Math.abs(dy)<48)return;var sc=document.getElementById('sc'+cur);if(sc&&sc.getAttribute('data-i')){var g=sc.querySelector('.chs');if(g&&!g.querySelector('.on')){toast('先选择你的答案');return;}}tlocked=true;setTimeout(function(){tlocked=false;},800);if(dy>0&&cur<TOTAL-1)go(cur+1);else if(dy<0&&cur>0)go(cur-1);},{passive:true});
+go(0);
 </script>
 </body>
 </html>
