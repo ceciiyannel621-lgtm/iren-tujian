@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>i人图鉴</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f0e8;
+    --ink: #1a1a1a;
+    --soft: #8a7f72;
+    --accent: #c8a882;
+    --card-bg: #fffdf8;
+    --blush: #e8d5c4;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--ink); font-family: 'Noto Serif SC', serif; overflow-x: hidden; }
+  nav { position: fixed; top: 0; left: 0; right: 0; padding: 20px 32px; display: flex; justify-content: space-between; align-items: center; z-index: 100; background: rgba(245,240,232,0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+  .nav-logo { font-family: 'ZCOOL XiaoWei', serif; font-size: 20px; letter-spacing: 4px; }
+  .nav-tag { font-size: 11px; letter-spacing: 2px; color: var(--soft); }
+  .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 100px 24px 60px; position: relative; overflow: hidden; }
+  .hero-bg-text { position: absolute; font-family: 'ZCOOL XiaoWei', serif; font-size: clamp(100px, 30vw, 220px); color: var(--blush); opacity: 0.5; user-select: none; z-index: 0; animation: float 9s ease-in-out infinite; }
+  @keyframes float { 0%,100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-18px) rotate(1deg); } }
+  .hero-content { position: relative; z-index: 1; }
+  .hero-label { display: inline-block; font-size: 10px; letter-spacing: 4px; color: var(--soft); border: 1px solid var(--accent); padding: 6px 18px; border-radius: 20px; margin-bottom: 36px; opacity: 0; animation: fadeUp 1s 0.3s ease forwards; }
+  .hero-title { font-family: 'ZCOOL XiaoWei', serif; font-size: clamp(44px, 13vw, 90px); line-height: 1.15; margin-bottom: 24px; opacity: 0; animation: fadeUp 1s 0.5s ease forwards; }
+  .hero-title span { color: var(--accent); position: relative; }
+  .hero-title span::after { content: ''; position: absolute; bottom: 2px; left: 0; right: 0; height: 3px; background: var(--accent); border-radius: 2px; transform: scaleX(0); transform-origin: left; animation: lineIn 0.8s 1.3s ease forwards; }
+  @keyframes lineIn { to { transform: scaleX(1); } }
+  .hero-sub { font-size: clamp(14px, 4vw, 18px); color: var(--soft); line-height: 2; max-width: 380px; margin: 0 auto 56px; font-weight: 300; opacity: 0; animation: fadeUp 1s 0.7s ease forwards; }
+  .scroll-hint { position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px; opacity: 0; animation: fadeUp 1s 1.5s ease forwards; }
+  .scroll-hint span { font-size: 10px; letter-spacing: 3px; color: var(--soft); }
+  .scroll-line { width: 1px; height: 44px; background: linear-gradient(to bottom, var(--accent), transparent); animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0% { opacity: 0; transform: scaleY(0); transform-origin: top; } 50% { opacity: 1; transform: scaleY(1); transform-origin: top; } 100% { opacity: 0; transform: scaleY(1); transform-origin: bottom; } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
+  .cards-section { padding: 60px 20px 100px; max-width: 500px; margin: 0 auto; }
+  .section-label { font-size: 10px; letter-spacing: 5px; color: var(--accent); text-align: center; margin-bottom: 44px; opacity: 0; transform: translateY(16px); transition: all 0.8s ease; }
+  .section-label.visible { opacity: 1; transform: translateY(0); }
+  .card { background: var(--card-bg); border-radius: 22px; padding: 28px 28px 22px; margin-bottom: 22px; box-shadow: 0 2px 20px rgba(0,0,0,0.05), 0 0 0 1px rgba(200,168,130,0.15); opacity: 0; transform: translateY(44px); transition: opacity 0.7s ease, transform 0.7s ease, box-shadow 0.3s ease; position: relative; overflow: hidden; }
+  .card.visible { opacity: 1; transform: translateY(0); }
+  .card.visible:hover { box-shadow: 0 12px 40px rgba(0,0,0,0.1); transform: translateY(-3px); }
+  .card-number { font-size: 10px; letter-spacing: 3px; color: var(--accent); margin-bottom: 16px; }
+  .card-text { font-size: clamp(15px, 4.2vw, 18px); line-height: 1.9; color: var(--ink); font-weight: 300; margin-bottom: 22px; }
+  .card-text em { font-style: normal; color: var(--accent); border-bottom: 1px solid rgba(200,168,130,0.5); }
+  .card-footer { display: flex; justify-content: space-between; align-items: center; }
+  .card-tag { font-size: 11px; color: var(--soft); letter-spacing: 1px; }
+  .resonate-btn { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--soft); background: none; border: 1px solid var(--blush); padding: 7px 16px; border-radius: 20px; cursor: pointer; font-family: 'Noto Serif SC', serif; transition: all 0.3s ease; -webkit-tap-highlight-color: transparent; }
+  .resonate-btn:active { transform: scale(0.96); }
+  .resonate-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+  .quote-section { padding: 90px 32px; text-align: center; position: relative; overflow: hidden; background: linear-gradient(150deg, var(--blush) 0%, var(--bg) 65%); }
+  .quote-text { font-family: 'ZCOOL XiaoWei', serif; font-size: clamp(22px, 6vw, 38px); line-height: 1.75; color: var(--ink); max-width: 360px; margin: 0 auto 20px; opacity: 0; transform: translateY(30px); transition: all 1s ease; }
+  .quote-text.visible { opacity: 1; transform: translateY(0); }
+  .quote-author { font-size: 11px; letter-spacing: 3px; color: var(--soft); opacity: 0; transition: opacity 1s 0.4s ease; }
+  .quote-author.visible { opacity: 1; }
+  footer { text-align: center; padding: 48px 24px; font-size: 11px; letter-spacing: 3px; color: var(--soft); border-top: 1px solid var(--blush); }
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo">i人图鉴</div>
+  <div class="nav-tag">内向星球</div>
+</nav>
+<section class="hero">
+  <div class="hero-bg-text">内向</div>
+  <div class="hero-content">
+    <div class="hero-label">FOR INTROVERTS · 写给懂的人</div>
+    <h1 class="hero-title">那些<span>说不出口</span><br>的小心思</h1>
+    <p class="hero-sub">不是不想说<br>只是在心里演练了一百遍之后<br>决定，算了</p>
+  </div>
+  <div class="scroll-hint"><span>向下</span><div class="scroll-line"></div></div>
+</section>
+<section class="cards-section">
+  <div class="section-label">今日图鉴</div>
+  <div class="card" data-delay="0"><div class="card-number">No. 001</div><p class="card-text">在群里被@了，先假装没看到，把<em>回复在心里演练三遍</em>，确认没问题，再若无其事地发出去。</p><div class="card-footer"><span class="card-tag"># 社交代价</span><button class="resonate-btn" onclick="resonate(this)"><span>我也是</span><span class="resonate-count">2.1k</span></button></div></div>
+  <div class="card" data-delay="120"><div class="card-number">No. 002</div><p class="card-text">朋友说"随便你决定"，我在脑子里<em>过了八个方案</em>，最后说：要不你来吧，我都行。</p><div class="card-footer"><span class="card-tag"># 选择困难</span><button class="resonate-btn" onclick="resonate(this)"><span>我也是</span><span class="resonate-count">3.4k</span></button></div></div>
+  <div class="card" data-delay="240"><div class="card-number">No. 003</div><p class="card-text">聚会结束回到家，<em>独自复盘今天说的每句话</em>，然后发现有一句好像说得有点奇怪，辗转反侧。</p><div class="card-footer"><span class="card-tag"># 社交后遗症</span><button class="resonate-btn" onclick="resonate(this)"><span>我也是</span><span class="resonate-count">5.7k</span></button></div></div>
+  <div class="card" data-delay="360"><div class="card-number">No. 004</div><p class="card-text">陌生来电，<em>不接</em>，等它挂断，搜索号码，确认是快递，再打回去，用最简短的话说完。</p><div class="card-footer"><span class="card-tag"># 电话恐惧</span><button class="resonate-btn" onclick="resonate(this)"><span>我也是</span><span class="resonate-count">8.2k</span></button></div></div>
+  <div class="card" data-delay="480"><div class="card-number">No. 005</div><p class="card-text">去陌生的地方之前，会<em>提前在地图上走一遍路线</em>，确认出口在哪、在哪等人、电梯在几楼。</p><div class="card-footer"><span class="card-tag"># 提前演练</span><button class="resonate-btn" onclick="resonate(this)"><span>我也是</span><span class="resonate-count">4.9k</span></button></div></div>
+  <div class="card" data-delay="600"><div class="card-number">No. 006</div><p class="card-text">跟不熟的人一起等电梯，会<em>假装在看手机</em>，其实屏幕是黑的，只是不知道该说什么。</p><div class="card-footer"><span class="card-tag"># 尴尬急救</span><button class="resonate-btn" onclick="resonate(this)"><span>我也是</span><span class="resonate-count">11.3k</span></button></div></div>
+</section>
+<section class="quote-section">
+  <p class="quote-text" id="quoteText">安静，不是因为没有话说<br>是因为值得说的人<br>还没出现</p>
+  <p class="quote-author" id="quoteAuthor">— i人图鉴 · 第一卷</p>
+</section>
+<footer>i人图鉴 · 写给懂的人 · 每日更新</footer>
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const delay = parseInt(entry.target.dataset.delay || 0);
+        setTimeout(() => entry.target.classList.add('visible'), delay);
+      }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.card, .section-label, .quote-text, .quote-author').forEach(el => observer.observe(el));
+  window.addEventListener('scroll', () => {
+    const el = document.querySelector('.hero-bg-text');
+    if (el) el.style.transform = `translateY(${window.scrollY * 0.28}px) rotate(-3deg)`;
+  }, { passive: true });
+  function resonate(btn) {
+    btn.classList.toggle('active');
+    const countEl = btn.querySelector('.resonate-count');
+    const raw = parseFloat(countEl.textContent) * 1000;
+    const delta = btn.classList.contains('active') ? 1 : -1;
+    const newVal = (raw + delta) / 1000;
+    countEl.textContent = newVal >= 1 ? newVal.toFixed(1) + 'k' : Math.round(newVal * 1000);
+  }
+</script>
+</body>
+</html>
